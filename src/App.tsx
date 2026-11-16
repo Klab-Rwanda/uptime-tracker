@@ -1,10 +1,7 @@
+import { PlatformRouter } from './features/platform';
+
 function App() {
-  return (
-    <div>
-      <h1>UpTime Tracker</h1>
-      <p>Frontend application is running.</p>
-    </div>
-  );
+  return <PlatformRouter />;
 }
 
 export default App;
