@@ -5,23 +5,47 @@ const STORAGE_KEY = 'uptime_clients';
 const initialClients: Client[] = [
   {
     id: '1',
-    name: 'Acme Corp',
+    name: 'Acme Corporation',
+    email: 'contact@acme.com',
+    phone: '+1-555-0101',
+    address: '123 Main St, New York, NY 10001',
     description: 'Enterprise client for the uptime tracker',
-    contactEmail: 'admin@acme.com',
-    contactPhone: '555-0101',
     status: 'active',
-    createdAt: new Date(Date.now() - 86400000 * 90).toISOString(),
-    updatedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
+    createdAt: new Date(Date.now() - 86400000 * 30).toISOString(),
+    updatedAt: new Date(Date.now() - 86400000 * 5).toISOString(),
   },
   {
     id: '2',
-    name: 'Globex Inc',
+    name: 'Globex Industries',
+    email: 'support@globex.com',
+    phone: '+1-555-0102',
+    address: '456 Industrial Blvd, Chicago, IL 60601',
     description: 'Mid-size enterprise client',
-    contactEmail: 'support@globex.com',
-    contactPhone: '555-0102',
     status: 'active',
     createdAt: new Date(Date.now() - 86400000 * 60).toISOString(),
-    updatedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+    updatedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+  },
+  {
+    id: '3',
+    name: 'Stark Holdings',
+    email: 'tony@stark.com',
+    phone: '+1-555-0103',
+    address: '789 Tower Ave, Malibu, CA 90265',
+    description: 'High-profile client',
+    status: 'pending',
+    createdAt: new Date(Date.now() - 86400000 * 10).toISOString(),
+    updatedAt: new Date(Date.now() - 86400000).toISOString(),
+  },
+  {
+    id: '4',
+    name: 'Wayne Enterprises',
+    email: 'hello@wayne.com',
+    phone: '+1-555-0104',
+    address: '321 Gotham Way, Gotham, NJ 07030',
+    description: 'Major corporate client',
+    status: 'inactive',
+    createdAt: new Date(Date.now() - 86400000 * 120).toISOString(),
+    updatedAt: new Date(Date.now() - 86400000 * 15).toISOString(),
   },
 ];
 
@@ -50,7 +74,13 @@ const saveClients = (clients: Client[]) => {
  */
 export const clientService = {
   getClients: async (filters?: ClientFilters): Promise<ClientListResponse> => {
-    await new Promise((resolve) => setTimeout(resolve, 150));
+    await new Promise((resolve) => setTimeout(resolve, 300));
+=======
+ */
+export const clientService = {
+  getClients: async (filters?: ClientFilters): Promise<ClientListResponse> => {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+>>>>>>> origin/main
     let clients = loadClients();
 
     if (filters?.search) {
@@ -59,7 +89,14 @@ export const clientService = {
         (c) =>
           c.name.toLowerCase().includes(term) ||
           c.description.toLowerCase().includes(term) ||
-          c.contactEmail.toLowerCase().includes(term),
+          c.email.toLowerCase().includes(term) ||
+          c.phone.includes(term) ||
+          c.address.toLowerCase().includes(term),
+=======
+          c.email.toLowerCase().includes(term) ||
+          c.phone.includes(term) ||
+          c.address.toLowerCase().includes(term),
+>>>>>>> origin/main
       );
     }
 
@@ -69,7 +106,7 @@ export const clientService = {
 
     const total = clients.length;
     const page = filters?.page ?? 1;
-    const limit = filters?.limit ?? 100;
+    const limit = filters?.limit ?? 10;
     const start = (page - 1) * limit;
     const paginated = clients.slice(start, start + limit);
 
@@ -82,7 +119,10 @@ export const clientService = {
   },
 
   getClientById: async (id: string): Promise<Client> => {
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 200));
+=======
+    await new Promise((resolve) => setTimeout(resolve, 200));
+>>>>>>> origin/main
     const clients = loadClients();
     const client = clients.find((c) => c.id === id);
     if (!client) {
@@ -92,7 +132,10 @@ export const clientService = {
   },
 
   createClient: async (data: ClientFormData): Promise<Client> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 400));
+=======
+    await new Promise((resolve) => setTimeout(resolve, 400));
+>>>>>>> origin/main
     const clients = loadClients();
     const now = new Date().toISOString();
     const newClient: Client = {
@@ -106,7 +149,10 @@ export const clientService = {
   },
 
   updateClient: async (id: string, data: ClientFormData): Promise<Client> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 400));
+=======
+    await new Promise((resolve) => setTimeout(resolve, 400));
+>>>>>>> origin/main
     const clients = loadClients();
     const index = clients.findIndex((c) => c.id === id);
     if (index === -1) {
@@ -123,7 +169,10 @@ export const clientService = {
   },
 
   deleteClient: async (id: string): Promise<void> => {
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    await new Promise((resolve) => setTimeout(resolve, 300));
+=======
+    await new Promise((resolve) => setTimeout(resolve, 300));
+>>>>>>> origin/main
     const clients = loadClients();
     const filtered = clients.filter((c) => c.id !== id);
     if (filtered.length === clients.length) {

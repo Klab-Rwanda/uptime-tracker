@@ -2,8 +2,9 @@ export interface Client {
   id: string;
   name: string;
   description: string;
-  contactEmail: string;
-  contactPhone: string;
+  email: string;
+  phone: string;
+  address: string;
   status: 'active' | 'inactive' | 'pending';
   createdAt: string;
   updatedAt: string;
@@ -15,7 +16,6 @@ export interface ClientListResponse {
   page: number;
   limit: number;
 }
-
 export interface ClientFilters {
   search?: string;
   status?: Client['status'];
@@ -26,7 +26,8 @@ export interface ClientFilters {
 export interface ClientFormData {
   name: string;
   description: string;
-  contactEmail: string;
-  contactPhone: string;
+  email: string;
+  phone: string;
+  address: string;
   status: Client['status'];
 }

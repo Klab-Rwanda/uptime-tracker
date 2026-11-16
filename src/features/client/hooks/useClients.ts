@@ -3,16 +3,17 @@ import { clientService } from '../services/clientService';
 import { Client, ClientFilters, ClientListResponse } from '../types/client.types';
 
 /**
- * Hook for managing the list of clients with search, filter, and pagination.
+ * Hook for managing a list of clients with search, filter, and pagination.
  */
 export const useClients = (initialFilters?: ClientFilters) => {
   const [clients, setClients] = useState<Client[]>([]);
   const [total, setTotal] = useState(0);
   const [filters, setFilters] = useState<ClientFilters>(initialFilters ?? {});
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true); // initial load only
+  const [refreshing, setRefreshing] = useState(false); // refetches from filters
   const [error, setError] = useState<Error | null>(null);
 
+  // Initial load - runs once on mount
   useEffect(() => {
     setLoading(true);
     setError(null);
@@ -30,6 +31,7 @@ export const useClients = (initialFilters?: ClientFilters) => {
       });
   }, []);
 
+  // Refresh on filter/page changes
   const fetchClients = useCallback(async () => {
     setRefreshing(true);
     setError(null);
