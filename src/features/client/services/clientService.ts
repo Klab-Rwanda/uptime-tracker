@@ -75,12 +75,10 @@ const saveClients = (clients: Client[]) => {
 export const clientService = {
   getClients: async (filters?: ClientFilters): Promise<ClientListResponse> => {
     await new Promise((resolve) => setTimeout(resolve, 300));
-=======
  */
 export const clientService = {
   getClients: async (filters?: ClientFilters): Promise<ClientListResponse> => {
     await new Promise((resolve) => setTimeout(resolve, 300));
->>>>>>> origin/main
     let clients = loadClients();
 
     if (filters?.search) {
@@ -92,11 +90,9 @@ export const clientService = {
           c.email.toLowerCase().includes(term) ||
           c.phone.includes(term) ||
           c.address.toLowerCase().includes(term),
-=======
           c.email.toLowerCase().includes(term) ||
           c.phone.includes(term) ||
           c.address.toLowerCase().includes(term),
->>>>>>> origin/main
       );
     }
 
@@ -120,9 +116,7 @@ export const clientService = {
 
   getClientById: async (id: string): Promise<Client> => {
     await new Promise((resolve) => setTimeout(resolve, 200));
-=======
     await new Promise((resolve) => setTimeout(resolve, 200));
->>>>>>> origin/main
     const clients = loadClients();
     const client = clients.find((c) => c.id === id);
     if (!client) {
@@ -133,9 +127,7 @@ export const clientService = {
 
   createClient: async (data: ClientFormData): Promise<Client> => {
     await new Promise((resolve) => setTimeout(resolve, 400));
-=======
     await new Promise((resolve) => setTimeout(resolve, 400));
->>>>>>> origin/main
     const clients = loadClients();
     const now = new Date().toISOString();
     const newClient: Client = {
@@ -150,9 +142,7 @@ export const clientService = {
 
   updateClient: async (id: string, data: ClientFormData): Promise<Client> => {
     await new Promise((resolve) => setTimeout(resolve, 400));
-=======
     await new Promise((resolve) => setTimeout(resolve, 400));
->>>>>>> origin/main
     const clients = loadClients();
     const index = clients.findIndex((c) => c.id === id);
     if (index === -1) {
@@ -170,9 +160,7 @@ export const clientService = {
 
   deleteClient: async (id: string): Promise<void> => {
     await new Promise((resolve) => setTimeout(resolve, 300));
-=======
     await new Promise((resolve) => setTimeout(resolve, 300));
->>>>>>> origin/main
     const clients = loadClients();
     const filtered = clients.filter((c) => c.id !== id);
     if (filtered.length === clients.length) {
