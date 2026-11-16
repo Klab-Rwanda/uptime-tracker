@@ -75,10 +75,6 @@ const saveClients = (clients: Client[]) => {
 export const clientService = {
   getClients: async (filters?: ClientFilters): Promise<ClientListResponse> => {
     await new Promise((resolve) => setTimeout(resolve, 300));
- */
-export const clientService = {
-  getClients: async (filters?: ClientFilters): Promise<ClientListResponse> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
     let clients = loadClients();
 
     if (filters?.search) {
@@ -87,9 +83,6 @@ export const clientService = {
         (c) =>
           c.name.toLowerCase().includes(term) ||
           c.description.toLowerCase().includes(term) ||
-          c.email.toLowerCase().includes(term) ||
-          c.phone.includes(term) ||
-          c.address.toLowerCase().includes(term),
           c.email.toLowerCase().includes(term) ||
           c.phone.includes(term) ||
           c.address.toLowerCase().includes(term),
