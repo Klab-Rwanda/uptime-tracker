@@ -75,10 +75,6 @@ const saveClients = (clients: Client[]) => {
 export const clientService = {
   getClients: async (filters?: ClientFilters): Promise<ClientListResponse> => {
     await new Promise((resolve) => setTimeout(resolve, 300));
- */
-export const clientService = {
-  getClients: async (filters?: ClientFilters): Promise<ClientListResponse> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
     let clients = loadClients();
 
     if (filters?.search) {
@@ -87,9 +83,6 @@ export const clientService = {
         (c) =>
           c.name.toLowerCase().includes(term) ||
           c.description.toLowerCase().includes(term) ||
-          c.email.toLowerCase().includes(term) ||
-          c.phone.includes(term) ||
-          c.address.toLowerCase().includes(term),
           c.email.toLowerCase().includes(term) ||
           c.phone.includes(term) ||
           c.address.toLowerCase().includes(term),
@@ -116,7 +109,6 @@ export const clientService = {
 
   getClientById: async (id: string): Promise<Client> => {
     await new Promise((resolve) => setTimeout(resolve, 200));
-    await new Promise((resolve) => setTimeout(resolve, 200));
     const clients = loadClients();
     const client = clients.find((c) => c.id === id);
     if (!client) {
@@ -126,7 +118,6 @@ export const clientService = {
   },
 
   createClient: async (data: ClientFormData): Promise<Client> => {
-    await new Promise((resolve) => setTimeout(resolve, 400));
     await new Promise((resolve) => setTimeout(resolve, 400));
     const clients = loadClients();
     const now = new Date().toISOString();
@@ -141,7 +132,6 @@ export const clientService = {
   },
 
   updateClient: async (id: string, data: ClientFormData): Promise<Client> => {
-    await new Promise((resolve) => setTimeout(resolve, 400));
     await new Promise((resolve) => setTimeout(resolve, 400));
     const clients = loadClients();
     const index = clients.findIndex((c) => c.id === id);
@@ -159,7 +149,6 @@ export const clientService = {
   },
 
   deleteClient: async (id: string): Promise<void> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
     await new Promise((resolve) => setTimeout(resolve, 300));
     const clients = loadClients();
     const filtered = clients.filter((c) => c.id !== id);
