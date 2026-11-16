@@ -9,6 +9,7 @@ const initialClients: Client[] = [
     email: 'contact@acme.com',
     phone: '+1-555-0101',
     address: '123 Main St, New York, NY 10001',
+    description: 'Enterprise client for the uptime tracker',
     status: 'active',
     createdAt: new Date(Date.now() - 86400000 * 30).toISOString(),
     updatedAt: new Date(Date.now() - 86400000 * 5).toISOString(),
@@ -19,6 +20,7 @@ const initialClients: Client[] = [
     email: 'support@globex.com',
     phone: '+1-555-0102',
     address: '456 Industrial Blvd, Chicago, IL 60601',
+    description: 'Mid-size enterprise client',
     status: 'active',
     createdAt: new Date(Date.now() - 86400000 * 60).toISOString(),
     updatedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
@@ -29,6 +31,7 @@ const initialClients: Client[] = [
     email: 'tony@stark.com',
     phone: '+1-555-0103',
     address: '789 Tower Ave, Malibu, CA 90265',
+    description: 'High-profile client',
     status: 'pending',
     createdAt: new Date(Date.now() - 86400000 * 10).toISOString(),
     updatedAt: new Date(Date.now() - 86400000).toISOString(),
@@ -39,6 +42,7 @@ const initialClients: Client[] = [
     email: 'hello@wayne.com',
     phone: '+1-555-0104',
     address: '321 Gotham Way, Gotham, NJ 07030',
+    description: 'Major corporate client',
     status: 'inactive',
     createdAt: new Date(Date.now() - 86400000 * 120).toISOString(),
     updatedAt: new Date(Date.now() - 86400000 * 15).toISOString(),
@@ -66,6 +70,11 @@ const saveClients = (clients: Client[]) => {
 
 /**
  * Client API service (mocked with localStorage).
+ * Replace with real HTTP calls when a backend is available.
+ */
+export const clientService = {
+  getClients: async (filters?: ClientFilters): Promise<ClientListResponse> => {
+    await new Promise((resolve) => setTimeout(resolve, 300));
  */
 export const clientService = {
   getClients: async (filters?: ClientFilters): Promise<ClientListResponse> => {
@@ -77,6 +86,10 @@ export const clientService = {
       clients = clients.filter(
         (c) =>
           c.name.toLowerCase().includes(term) ||
+          c.description.toLowerCase().includes(term) ||
+          c.email.toLowerCase().includes(term) ||
+          c.phone.includes(term) ||
+          c.address.toLowerCase().includes(term),
           c.email.toLowerCase().includes(term) ||
           c.phone.includes(term) ||
           c.address.toLowerCase().includes(term),
@@ -103,6 +116,7 @@ export const clientService = {
 
   getClientById: async (id: string): Promise<Client> => {
     await new Promise((resolve) => setTimeout(resolve, 200));
+    await new Promise((resolve) => setTimeout(resolve, 200));
     const clients = loadClients();
     const client = clients.find((c) => c.id === id);
     if (!client) {
@@ -112,6 +126,7 @@ export const clientService = {
   },
 
   createClient: async (data: ClientFormData): Promise<Client> => {
+    await new Promise((resolve) => setTimeout(resolve, 400));
     await new Promise((resolve) => setTimeout(resolve, 400));
     const clients = loadClients();
     const now = new Date().toISOString();
@@ -126,6 +141,7 @@ export const clientService = {
   },
 
   updateClient: async (id: string, data: ClientFormData): Promise<Client> => {
+    await new Promise((resolve) => setTimeout(resolve, 400));
     await new Promise((resolve) => setTimeout(resolve, 400));
     const clients = loadClients();
     const index = clients.findIndex((c) => c.id === id);
@@ -143,6 +159,7 @@ export const clientService = {
   },
 
   deleteClient: async (id: string): Promise<void> => {
+    await new Promise((resolve) => setTimeout(resolve, 300));
     await new Promise((resolve) => setTimeout(resolve, 300));
     const clients = loadClients();
     const filtered = clients.filter((c) => c.id !== id);

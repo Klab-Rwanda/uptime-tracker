@@ -1,4 +1,9 @@
-export type { Client, ClientFilters, ClientListResponse, ClientFormData } from './types/client.types';
+export type {
+  Client,
+  ClientListResponse,
+  ClientFilters,
+  ClientFormData,
+} from './types/client.types';
 export { clientService } from './services/clientService';
 export { useClients } from './hooks/useClients';
 export { useClient } from './hooks/useClient';
@@ -16,3 +21,4 @@ export {
   ClientDetailsPage,
 } from './pages';
 export { clientRoutes, ClientRouter } from './clientRouter';
+
