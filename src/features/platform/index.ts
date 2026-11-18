@@ -15,4 +15,4 @@ export {
   PlatformEditPage,
   PlatformDetailsPage,
 } from './pages';
-export { platformRoutes, PlatformRouter } from './platformRouter';
+export { platformRoutes } from './platformRouter';

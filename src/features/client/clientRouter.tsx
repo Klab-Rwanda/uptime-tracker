@@ -1,9 +1,4 @@
-import {
-  createBrowserRouter,
-  RouterProvider,
-  RouteObject,
-  Outlet,
-} from 'react-router-dom';
+import { RouteObject, Outlet } from 'react-router-dom';
 import {
   ClientListPage,
   ClientAddPage,
@@ -56,12 +51,3 @@ export const clientRoutes: RouteObject[] = [
     ],
   },
 ];
-
-/**
- * Renders the client router provider.
- * Intended to be mounted from the app root (e.g. App.tsx).
- */
-export const ClientRouter = () => {
-  const router = createBrowserRouter(clientRoutes);
-  return <RouterProvider router={router} />;
-};

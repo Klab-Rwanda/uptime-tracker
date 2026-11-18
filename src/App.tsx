@@ -1,6 +1,7 @@
 import { createBrowserRouter, NavLink, Outlet, RouterProvider } from 'react-router-dom';
 import { clientRoutes } from './features/client';
 import { platformRoutes } from './features/platform';
+import { logsIncidentsRoutes } from './features/logs-incidents';
 
 const AppLayout = () => (
   <div className="min-h-screen bg-gray-50 text-gray-900">
@@ -44,7 +45,7 @@ const AppLayout = () => (
 const router = createBrowserRouter([
   {
     element: <AppLayout />,
-    children: [...clientRoutes, ...platformRoutes],
+    children: [...clientRoutes, ...platformRoutes, ...logsIncidentsRoutes],
   },
 ]);
 
