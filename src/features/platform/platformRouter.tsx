@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider, RouteObject } from 'react-router-dom';
+import { RouteObject } from 'react-router-dom';
 import {
   PlatformListPage,
   PlatformAddPage,
@@ -28,12 +28,3 @@ export const platformRoutes: RouteObject[] = [
     element: <PlatformDetailsPage />,
   },
 ];
-
-/**
- * Renders the platform router provider.
- * Intended to be mounted from the app root (e.g. App.tsx).
- */
-export const PlatformRouter = () => {
-  const router = createBrowserRouter(platformRoutes);
-  return <RouterProvider router={router} />;
-};

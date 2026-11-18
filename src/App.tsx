@@ -1,13 +1,16 @@
-import { PlatformRouter } from './features/platform';
-import { ClientRouter } from './features/client';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { platformRoutes } from './features/platform';
+import { clientRoutes } from './features/client';
+import { logsIncidentsRoutes } from './features/logs-incidents';
+
+const router = createBrowserRouter([
+  ...platformRoutes,
+  ...clientRoutes,
+  ...logsIncidentsRoutes,
+]);
 
 function App() {
-  return (
-    <>
-      <PlatformRouter />
-      <ClientRouter />
-    </>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
