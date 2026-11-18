@@ -20,5 +20,5 @@ export {
   ClientEditPage,
   ClientDetailsPage,
 } from './pages';
-export { clientRoutes, ClientRouter } from './clientRouter';
+export { clientRoutes } from './clientRouter';
 

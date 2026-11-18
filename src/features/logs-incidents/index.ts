@@ -26,4 +26,4 @@ export {
   IncidentsListPage,
   IncidentDetailsPage,
 } from './pages';
-export { logsIncidentsRoutes, LogsIncidentsRouter } from './logsIncidentsRouter';
+export { logsIncidentsRoutes } from './logsIncidentsRouter';

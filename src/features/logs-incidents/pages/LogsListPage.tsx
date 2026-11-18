@@ -90,7 +90,7 @@ export const LogsListPage = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Logs</h2>
+            <h2 className="text-2xl font-semibold text-gray-900">Logs</h2>
             <p className="mt-1 text-gray-500">
               View and filter system log entries.
             </p>
@@ -111,7 +111,7 @@ export const LogsListPage = () => {
                 onChange={(val) => setSearchQuery(val)}
               />
             </div>
-            <div className="w-full sm:w-auto">
+            <div className="w-full sm:w-auto min-w-0">
               <LogFilters
                 level={level}
                 platformId={platformId}

@@ -71,65 +71,72 @@ export const IncidentFilters = ({
   ];
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-      <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
-        <label className="text-sm font-medium text-gray-700">Status:</label>
-        <select
-          value={status}
-          onChange={handleStatusChange}
-          className="block w-full sm:w-48 pl-3 pr-10 py-2 text-sm bg-white border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
-        >
-          {statusOptions.map((option) => (
-            <option key={option.value} value={option.value} className="text-sm">
-              {option.label}
-            </option>
-          ))}
-        </select>
-
-        <label className="text-sm font-medium text-gray-700 ml-4 sm:ml-0">Severity:</label>
-        <select
-          value={severity}
-          onChange={handleSeverityChange}
-          className="block w-full sm:w-48 pl-3 pr-10 py-2 text-sm bg-white border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
-        >
-          {severityOptions.map((option) => (
-            <option key={option.value} value={option.value} className="text-sm">
-              {option.label}
-            </option>
-          ))}
-        </select>
-
-        <label className="text-sm font-medium text-gray-700 ml-4 sm:ml-0">Platform:</label>
-        <select
-          value={platformId ?? 'all'}
-          onChange={handlePlatformChange}
-          className="block w-full sm:w-48 pl-3 pr-10 py-2 text-sm bg-white border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
-        >
-          <option value="all">All Platforms</option>
-          {platforms.map((platform) => (
-            <option key={platform.id} value={platform.id} className="text-sm">
-              {platform.name}
-            </option>
-          ))}
-        </select>
+    <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-start gap-4">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 w-full min-w-0 flex-1">
+        <div className="flex flex-col gap-1 min-w-0 flex-1">
+          <label className="text-sm font-medium text-gray-700">Status:</label>
+          <select
+            value={status}
+            onChange={handleStatusChange}
+            className="block w-full pl-3 pr-10 py-2 text-sm bg-white border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
+          >
+            {statusOptions.map((option) => (
+              <option key={option.value} value={option.value} className="text-sm">
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1 min-w-0 flex-1 ml-4 sm:ml-0">
+          <label className="text-sm font-medium text-gray-700">Severity:</label>
+          <select
+            value={severity}
+            onChange={handleSeverityChange}
+            className="block w-full pl-3 pr-10 py-2 text-sm bg-white border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
+          >
+            {severityOptions.map((option) => (
+              <option key={option.value} value={option.value} className="text-sm">
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1 min-w-0 flex-1 ml-4 sm:ml-0">
+          <label className="text-sm font-medium text-gray-700">Platform:</label>
+          <select
+            value={platformId ?? 'all'}
+            onChange={handlePlatformChange}
+            className="block w-full pl-3 pr-10 py-2 text-sm bg-white border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
+          >
+            <option value="all">All Platforms</option>
+            {platforms.map((platform) => (
+              <option key={platform.id} value={platform.id} className="text-sm">
+                {platform.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
-        <label className="text-sm font-medium text-gray-700">From:</label>
-        <input
-          type="date"
-          value={startDate ?? ''}
-          onChange={handleStartDateChange}
-          className="block w-full sm:w-40 pl-3 py-2 text-sm bg-white border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
-        />
-
-        <label className="text-sm font-medium text-gray-700 ml-2 sm:ml-0">To:</label>
-        <input
-          type="date"
-          value={endDate ?? ''}
-          onChange={handleEndDateChange}
-          className="block w-full sm:w-40 pl-3 py-2 text-sm bg-white border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
-        />
+      <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 w-full min-w-0 flex-1">
+        <div className="flex flex-col gap-1 min-w-0 flex-1">
+          <label className="text-sm font-medium text-gray-700">From:</label>
+          <input
+            type="date"
+            value={startDate ?? ''}
+            onChange={handleStartDateChange}
+            className="block w-full pl-3 py-2 text-sm bg-white border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
+          />
+        </div>
+        <div className="flex flex-col gap-1 min-w-0 flex-1 ml-2 sm:ml-0 mt-2 sm:mt-0">
+          <label className="text-sm font-medium text-gray-700">To:</label>
+          <input
+            type="date"
+            value={endDate ?? ''}
+            onChange={handleEndDateChange}
+            className="block w-full pl-3 py-2 text-sm bg-white border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
+          />
+        </div>
       </div>
     </div>
   );
