@@ -10,6 +10,7 @@ import {
   ClientEditPage,
   ClientDetailsPage,
 } from './pages';
+import { DashboardPage } from '../dashboard/pages/DashboardPage';
 
 /**
  * Layout component rendered for all client routes.
@@ -34,7 +35,7 @@ export const clientRoutes: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <div className="text-gray-500">Select a client section above.</div>,
+        element: <DashboardPage />,
       },
       {
         path: 'clients',
