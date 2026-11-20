@@ -133,11 +133,11 @@ export const SettingsPage = () => {
         </div>
 
         {/* Company Details Section */}
-        <section className="bg-white shadow rounded-lg border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100">
+        <section className="bg-white dark:bg-gray-800 shadow rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-2">
-              <Monitor size={16} strokeWidth={1.5} className="text-gray-600" />
-              <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
+              <Monitor size={16} strokeWidth={1.5} className="text-gray-600 dark:text-gray-400" />
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">
                 Company details
               </h2>
             </div>
@@ -157,10 +157,10 @@ export const SettingsPage = () => {
                   value={companyName}
                   onChange={(e) => setCompanyName(e.target.value)}
                   disabled={!isCompanyEditable}
-                  className={`block w-full pl-3 pr-3 py-2 border rounded-md text-sm leading-5 bg-white
+                  className={`block w-full pl-3 pr-3 py-2 border rounded-md text-sm leading-5
                     ${isCompanyEditable
-                      ? 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'
-                      : 'border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed'}
+                      ? 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-indigo-500 focus:border-indigo-500'
+                      : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'}
                   `}
                   placeholder="Enter company name"
                   aria-disabled={!isCompanyEditable}
@@ -173,15 +173,15 @@ export const SettingsPage = () => {
               </div>
 
               {companyError && (
-                <div className="flex items-start gap-2 px-3 py-2 rounded bg-red-50 border border-red-100">
-                  <AlertCircle size={14} strokeWidth={1.5} className="text-red-600 shrink-0 mt-0.5" />
-                  <p className="text-sm text-red-700">{companyError}</p>
+                <div className="flex items-start gap-2 px-3 py-2 rounded bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30">
+                  <AlertCircle size={14} strokeWidth={1.5} className="text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                  <p className="text-sm text-red-700 dark:text-red-400">{companyError}</p>
                 </div>
               )}
               {companySuccess && (
-                <div className="flex items-start gap-2 px-3 py-2 rounded bg-green-50 border border-green-100">
-                  <CheckCircle size={14} strokeWidth={1.5} className="text-green-600 shrink-0 mt-0.5" />
-                  <p className="text-sm text-green-700">{companySuccess}</p>
+                <div className="flex items-start gap-2 px-3 py-2 rounded bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-900/30">
+                  <CheckCircle size={14} strokeWidth={1.5} className="text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
+                  <p className="text-sm text-green-700 dark:text-green-400">{companySuccess}</p>
                 </div>
               )}
 
@@ -220,11 +220,11 @@ export const SettingsPage = () => {
         </section>
 
         {/* Personal Preferences Section */}
-        <section className="mt-6 bg-white shadow rounded-lg border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100">
+        <section className="mt-6 bg-white dark:bg-gray-800 shadow rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-2">
-              <UserIcon size={16} strokeWidth={1.5} className="text-gray-600" />
-              <h2 className="text-sm font-semibold text-gray-900 uppercase tracking-wider">
+              <UserIcon size={16} strokeWidth={1.5} className="text-gray-600 dark:text-gray-400" />
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider">
                 Personal preferences
               </h2>
             </div>
@@ -234,11 +234,11 @@ export const SettingsPage = () => {
               <div>
                 <label
                   htmlFor="display-name"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                 >
                   Display name
                 </label>
-                <p className="text-xs text-gray-500 mb-3">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
                   Optional name displayed in your workspace.
                 </p>
                 <input
@@ -246,7 +246,7 @@ export const SettingsPage = () => {
                   type="text"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md text-sm leading-5 bg-white focus:ring-indigo-500 focus:border-indigo-500"
+                  className="block w-full pl-3 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"
                   placeholder="Your display name"
                 />
               </div>
@@ -255,7 +255,7 @@ export const SettingsPage = () => {
                 <div>
                   <label
                     htmlFor="timezone"
-                    className="block text-sm font-medium text-gray-700 mb-2"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
                   >
                     Timezone
                   </label>
@@ -263,7 +263,7 @@ export const SettingsPage = () => {
                     id="timezone"
                     value={timezone}
                     onChange={(e) => setTimezone(e.target.value)}
-                    className="block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md text-sm leading-5 bg-white focus:ring-indigo-500 focus:border-indigo-500"
+                    className="block w-full pl-3 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"
                   >
                     {DEFAULT_TIMEZONES.map((tz) => (
                       <option key={tz.value} value={tz.value}>
@@ -275,10 +275,10 @@ export const SettingsPage = () => {
 
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                       Notifications
                     </label>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       {notificationsEnabled ? 'Enabled' : 'Disabled'}
                     </p>
                   </div>
@@ -288,7 +288,7 @@ export const SettingsPage = () => {
                     className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
                       ${notificationsEnabled
                         ? 'border-indigo-600 bg-indigo-600'
-                        : 'border-gray-300 bg-gray-200'
+                        : 'border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-600'
                     }`}
                   >
                     <span
@@ -301,7 +301,7 @@ export const SettingsPage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                   Appearance
                 </label>
                 <div className="flex gap-2">
@@ -317,7 +317,7 @@ export const SettingsPage = () => {
                         className={`flex items-center justify-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors border
                           ${isSelected
                             ? 'border-indigo-600 bg-indigo-600 text-white'
-                            : 'border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100'
+                            : 'border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
                           }
                         `}
                       >
@@ -330,15 +330,15 @@ export const SettingsPage = () => {
               </div>
 
               {preferencesError && (
-                <div className="flex items-start gap-2 px-3 py-2 rounded bg-red-50 border border-red-100">
-                  <AlertCircle size={14} strokeWidth={1.5} className="text-red-600 shrink-0 mt-0.5" />
-                  <p className="text-sm text-red-700">{preferencesError}</p>
+                <div className="flex items-start gap-2 px-3 py-2 rounded bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30">
+                  <AlertCircle size={14} strokeWidth={1.5} className="text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
+                  <p className="text-sm text-red-700 dark:text-red-400">{preferencesError}</p>
                 </div>
               )}
               {preferencesSuccess && (
-                <div className="flex items-start gap-2 px-3 py-2 rounded bg-green-50 border border-green-100">
-                  <CheckCircle size={14} strokeWidth={1.5} className="text-green-600 shrink-0 mt-0.5" />
-                  <p className="text-sm text-green-700">{preferencesSuccess}</p>
+                <div className="flex items-start gap-2 px-3 py-2 rounded bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-900/30">
+                  <CheckCircle size={14} strokeWidth={1.5} className="text-green-600 dark:text-green-400 shrink-0 mt-0.5" />
+                  <p className="text-sm text-green-700 dark:text-green-400">{preferencesSuccess}</p>
                 </div>
               )}
 

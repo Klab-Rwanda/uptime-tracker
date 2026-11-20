@@ -4,7 +4,7 @@ import { WorkspaceTopNav } from './WorkspaceTopNav';
 
 export const WorkspaceLayout = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <WorkspaceSidebar />
       <div className={`${typeof window !== 'undefined' && window.innerWidth < 768 ? 'pl-0' : 'pl-64'}`}>
         <WorkspaceTopNav />
