@@ -10,6 +10,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useTheme } from '../../../contexts/ThemeContext';
 import { settingsService } from '../services/settingsService';
 import type { Appearance } from '../types/settings.types';
 import { DEFAULT_TIMEZONES } from '../types/settings.types';
@@ -31,7 +32,7 @@ export const SettingsPage = () => {
   const [displayName, setDisplayName] = useState('');
   const [timezone, setTimezone] = useState('UTC');
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [appearance, setAppearance] = useState<Appearance>('system');
+  const { appearance, setAppearance } = useTheme();
 
   const [isSavingCompany, setIsSavingCompany] = useState(false);
   const [isSavingPreferences, setIsSavingPreferences] = useState(false);
@@ -60,7 +61,7 @@ export const SettingsPage = () => {
 
   useEffect(() => {
     loadData();
-  }, [loadData]);
+  }, [loadData, setAppearance]);
 
   const clearCompanyMessages = useCallback(() => {
     setCompanyError(null);

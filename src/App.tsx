@@ -4,15 +4,18 @@ import { clientRoutes } from './features/client';
 import { logsIncidentsRoutes } from './features/logs-incidents';
 import { notificationsRoutes } from './features/notifications';
 import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { WorkspaceLayout } from './components/layout';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: (
-      <AuthProvider>
-        <WorkspaceLayout />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <WorkspaceLayout />
+        </AuthProvider>
+      </ThemeProvider>
     ),
     children: [
       ...platformRoutes,
