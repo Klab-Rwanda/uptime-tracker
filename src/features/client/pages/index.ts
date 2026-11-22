@@ -4,3 +4,4 @@ export { ClientEditPage } from './ClientEditPage';
 export { ClientDetailsPage } from './ClientDetailsPage';
 export { SettingsPage } from './SettingsPage';
 export { CompanyTeamPage } from './CompanyTeamPage';
+export { OverviewPage } from './OverviewPage';

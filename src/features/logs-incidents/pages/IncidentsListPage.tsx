@@ -75,7 +75,7 @@ export const IncidentsListPage = () => {
 
   if (loading) {
     return (
-      <div className="py-8 px-4 sm:px-6 lg:px-8">
+      <div className="py-8 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800">
         <div className="flex items-center justify-center h-64">
           <p className="text-gray-500">Loading incidents...</p>
         </div>
@@ -85,8 +85,8 @@ export const IncidentsListPage = () => {
 
   if (error) {
     return (
-      <div className="py-8 px-4 sm:px-6 lg:px-8">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div className="py-8 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800">
+        <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-900/30 rounded-lg p-4">
           <h3 className="text-red-800 font-medium">Error loading incidents</h3>
           <p className="mt-1 text-red-600">{error.message}</p>
           <button
@@ -100,11 +100,11 @@ export const IncidentsListPage = () => {
     );
   }
   return (
-    <div className="py-8 px-4 sm:px-6 lg:px-8">
+    <div className="py-8 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800">
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-6 bg-white dark:bg-gray-800">
           <div>
-            <h2 className="text-2xl font-semibold text-gray-900">Incidents</h2>
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-800">Incidents</h2>
             <p className="mt-1 text-gray-500">
               Monitor and manage service incidents.
             </p>

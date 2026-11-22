@@ -36,9 +36,9 @@ export const ClientListPage = () => {
 
   if (loading) {
     return (
-      <div className="py-8 px-4 sm:px-6 lg:px-8">
+      <div className="py-8 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800">
         <div className="flex items-center justify-center h-64">
-          <p className="text-gray-500">Loading clients...</p>
+          <p className="text-gray-500 dark:text-gray-400">Loading clients...</p>
         </div>
       </div>
     );
@@ -46,10 +46,10 @@ export const ClientListPage = () => {
 
   if (error) {
     return (
-      <div className="py-8 px-4 sm:px-6 lg:px-8">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <h3 className="text-red-800 font-medium">Error loading clients</h3>
-          <p className="mt-1 text-red-600">{error.message}</p>
+      <div className="py-8 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800">
+        <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-900/30 rounded-lg p-4">
+          <h3 className="text-red-800 dark:text-red-400 font-medium">Error loading clients</h3>
+          <p className="mt-1 text-red-600 dark:text-red-400">{error.message}</p>
           <button
             onClick={refetch}
             className="mt-2 text-sm text-indigo-600 hover:text-indigo-500"

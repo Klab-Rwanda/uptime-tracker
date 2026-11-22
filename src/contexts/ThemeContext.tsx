@@ -36,7 +36,7 @@ const applyAppearance = (appearance: Appearance) => {
 };
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [appearance, setAppearanceState] = useState<Appearance>('system');
+  const [appearance, setAppearanceState] = useState<Appearance>('light');
   const [isDark, setIsDark] = useState(false);
 
   // Load saved appearance on mount

@@ -16,9 +16,9 @@ export const NotificationsDetailsPage = () => {
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <div className="bg-white shadow rounded-lg border border-gray-200 p-8 text-center">
-          <p className="text-sm text-gray-500">Loading notification details...</p>
+      <div className="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800">
+        <div className="bg-white dark:bg-gray-800 shadow rounded-lg border border-gray-200 dark:border-gray-700 p-8 text-center">
+          <p className="text-sm text-gray-500 dark:text-gray-400">Loading notification details...</p>
         </div>
       </div>
     );

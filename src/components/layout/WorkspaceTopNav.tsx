@@ -3,7 +3,7 @@ import { Bell, LayoutDashboard } from 'lucide-react';
 
 const BREADCRUMB_MAP: Record<string, string> = {
   '/': 'Overview',
-  '/platforms': 'My platforms',
+  '/platforms': 'Platforms',
   '/logs': 'Logs & incidents',
   '/incidents': 'Incidents',
   '/notifications': 'Notifications',
@@ -30,7 +30,7 @@ export const WorkspaceTopNav = () => {
   };
 
   return (
-    <header className="sticky top-0 z-20 bg-white border-b border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+    <header className="sticky top-0 z-20 bg-white border-b border-gray-100 dark:bg-gray-800 dark:border-gray-700 ">
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
@@ -41,7 +41,7 @@ export const WorkspaceTopNav = () => {
           </span>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <button
             className="w-9 h-9 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 relative"
             aria-label="Notifications"

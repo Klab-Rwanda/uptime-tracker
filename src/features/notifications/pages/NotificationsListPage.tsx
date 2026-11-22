@@ -87,9 +87,9 @@ export const NotificationsListPage = () => {
 
   if (loading) {
     return (
-      <div className='max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8'>
-        <div className='bg-white shadow rounded-lg border border-gray-200 p-8 text-center'>
-          <p className='text-sm text-gray-500'>Loading notifications...</p>
+      <div className='max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800'>
+        <div className='bg-white dark:bg-gray-800 shadow rounded-lg border border-gray-200 dark:border-gray-700 p-8 text-center'>
+          <p className='text-sm text-gray-500 dark:text-gray-400'>Loading notifications...</p>
         </div>
       </div>
     );
@@ -97,8 +97,8 @@ export const NotificationsListPage = () => {
 
   if (error) {
     return (
-      <div className='max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8'>
-        <div className='bg-white shadow rounded-lg border border-gray-200 p-8 text-center'>
+      <div className='max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800'>
+        <div className='bg-white dark:bg-gray-800 shadow rounded-lg border border-gray-200 dark:border-gray-700 p-8 text-center'>
           <p className='text-sm text-red-600'>{error.message}</p>
           <button
             onClick={refetch}
@@ -112,10 +112,10 @@ export const NotificationsListPage = () => {
   }
 
   return (
-    <div className='max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8'>
-      <div className='mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
+    <div className='max-w-6xl min-h-screen mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800'>
+      <div className='mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-gray-800'>
         <div>
-          <h1 className='text-2xl font-bold text-gray-900'>Notifications</h1>
+          <h1 className='text-2xl font-bold text-gray-900 dark:text-gray-800'>Notifications</h1>
           <p className='text-sm text-gray-500 mt-1'>
             Manage your notifications and preferences.
           </p>

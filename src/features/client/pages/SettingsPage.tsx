@@ -41,7 +41,7 @@ export const SettingsPage = () => {
   const [preferencesError, setPreferencesError] = useState<string | null>(null);
   const [preferencesSuccess, setPreferencesSuccess] = useState<string | null>(null);
 
-  const isCompanyEditable = user ? CAN_EDIT_COMPANY.includes(user.role) : false;
+  const isCompanyEditable = user?.role ? CAN_EDIT_COMPANY.includes(user.role) : false;
 
   const loadData = useCallback(async () => {
     try {
@@ -219,8 +219,10 @@ export const SettingsPage = () => {
           </div>
         </section>
 
+        <hr className="my-8 border-gray-200 dark:border-gray-700" />
+
         {/* Personal Preferences Section */}
-        <section className="mt-6 bg-white dark:bg-gray-800 shadow rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <section className="bg-white dark:bg-gray-800 shadow rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
             <div className="flex items-center gap-2">
               <UserIcon size={16} strokeWidth={1.5} className="text-gray-600 dark:text-gray-400" />
@@ -251,53 +253,48 @@ export const SettingsPage = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div>
-                  <label
-                    htmlFor="timezone"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Timezone
-                  </label>
-                  <select
-                    id="timezone"
-                    value={timezone}
-                    onChange={(e) => setTimezone(e.target.value)}
-                    className="block w-full pl-3 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"
-                  >
-                    {DEFAULT_TIMEZONES.map((tz) => (
-                      <option key={tz.value} value={tz.value}>
-                        {tz.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div>
+                <label
+                  htmlFor="timezone"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  Timezone
+                </label>
+                <select
+                  id="timezone"
+                  value={timezone}
+                  onChange={(e) => setTimezone(e.target.value)}
+                  className="block w-full pl-3 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm leading-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-indigo-500 focus:border-indigo-500"
+                >
+                  {DEFAULT_TIMEZONES.map((tz) => (
+                    <option key={tz.value} value={tz.value}>
+                      {tz.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
+              <div className="flex items-center justify-between">
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                      Notifications
-                    </label>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {notificationsEnabled ? 'Enabled' : 'Disabled'}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setNotificationsEnabled(!notificationsEnabled)}
-                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
-                      ${notificationsEnabled
-                        ? 'border-indigo-600 bg-indigo-600'
-                        : 'border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-600'
-                    }`}
-                  >
-                    <span
-                      className={`inline-block h-3 w-3 rounded-full bg-white transform transition-transform
-                        ${notificationsEnabled ? 'translate-x-7' : 'translate-x-1'}
-                      `}
-                    />
-                  </button>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Notification preference
+                  </label>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setNotificationsEnabled(!notificationsEnabled)}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
+                    ${notificationsEnabled
+                      ? 'border-indigo-600 bg-indigo-600'
+                      : 'border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-600'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-3 w-3 rounded-full bg-white transform transition-transform
+                      ${notificationsEnabled ? 'translate-x-7' : 'translate-x-1'}
+                    `}
+                  />
+                </button>
               </div>
 
               <div>
