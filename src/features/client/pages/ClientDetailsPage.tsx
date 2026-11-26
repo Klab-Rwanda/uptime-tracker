@@ -23,8 +23,8 @@ export const ClientDetailsPage = () => {
 
   if (error || !client) {
     return (
-      <div className="py-8 px-4 sm:px-6 lg:px-8">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div className="py-8 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800">
+        <div className="bg-white dark:bg-red-900 border border-red-200 dark:border-red-900/30 rounded-lg p-4">
           <h3 className="text-red-800 font-medium">Client not found</h3>
           <p className="mt-1 text-red-600">{error?.message}</p>
           <button
@@ -61,7 +61,7 @@ export const ClientDetailsPage = () => {
         </div>
       </div>
 
-        <div className="bg-white shadow rounded-lg border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 shadow rounded-lg border border-gray-200 dark:border-gray-700">
           <div className="px-4 py-5 sm:p-6">
             <dl className="divide-y divide-gray-200">
               <div className="py-4 sm:py-5">

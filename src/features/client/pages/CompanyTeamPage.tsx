@@ -29,12 +29,10 @@ interface PendingInvite {
 }
 
 const ROLE_DESCRIPTIONS: Record<AccessLevel, string> = {
-  Viewer:
-    'Read platforms, logs, incidents, and notifications. Cannot create, edit, or delete platforms. Cannot manage company settings or team members.',
-  Operator:
-    'Viewer access plus platform management and incident actions. Cannot manage team members. Cannot change owner-level company settings.',
+  Viewer: 'Read platforms, logs, incidents, and notifications.',
+  Operator: 'Viewer access plus platform management and incident actions.',
   Administrator:
-    'Operator access plus company settings. Cannot add or remove team members unless explicitly allowed. Cannot change the workspace owner.',
+    'Operator access plus company settings. Team access remains owner-only.',
 };
 
 const ACCESS_LEVEL_ORDER: AccessLevel[] = ['Viewer', 'Operator', 'Administrator'];
@@ -164,8 +162,8 @@ export const CompanyTeamPage = () => {
 
   if (isLoading) {
     return (
-      <div className="py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
+      <div className="py-8 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800">
+        <div className="max-w-3xl mx-auto">
           <div className="flex justify-center py-12">
             <Loader2 className="h-8 w-8 text-indigo-600 animate-spin" />
           </div>
@@ -175,8 +173,8 @@ export const CompanyTeamPage = () => {
   }
 
   return (
-    <div className="py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="py-8 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800">
+      <div className="max-w-3xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
             <h1 className="text-xl font-semibold text-gray-900">Company team</h1>

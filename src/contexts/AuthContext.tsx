@@ -1,34 +1,115 @@
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
+import { authService } from '../features/auth/services/authService';
+import type { AuthUser, AuthState, LoginCredentials, RegisterData } from '../features/auth/types/auth.types';
 
 export type UserRole = 'Workspace owner' | 'Administrator' | 'Operator' | 'Viewer';
 
-export interface AuthUser {
-  email: string;
-  role: UserRole;
-}
-
-interface AuthContextType {
+export interface AuthContextType {
   user: AuthUser | null;
   signOut: () => void;
   isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+  login: (credentials: LoginCredentials) => Promise<void>;
+  register: (data: RegisterData) => Promise<void>;
+  clearError: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user] = useState<AuthUser>({
-    email: 'user@example.com',
-    role: 'Workspace owner',
+  const [state, setState] = useState<AuthState>({
+    user: null,
+    isAuthenticated: false,
+    isLoading: true,
+    error: null,
   });
 
-  const signOut = useCallback(() => {
-    // Preserve existing sign-out behavior: clear any localStorage auth state
-    localStorage.removeItem('uptime_auth');
-    window.location.href = '/';
+  // Load existing session on mount
+  useEffect(() => {
+    const session = authService.getSession();
+    if (session) {
+      setState({
+        user: session.user,
+        isAuthenticated: true,
+        isLoading: false,
+        error: null,
+      });
+    } else {
+      setState((prev: AuthState) => ({ ...prev, isLoading: false }));
+    }
   }, []);
 
+  const setError = useCallback((message: string | null) => {
+    setState((prev: AuthState) => ({ ...prev, error: message }));
+  }, []);
+
+  const clearError = useCallback(() => {
+    setError(null);
+  }, [setError]);
+
+  const login = useCallback(async (credentials: LoginCredentials) => {
+    setState((prev: AuthState) => ({ ...prev, isLoading: true, error: null }));
+    try {
+      const session = await authService.login(credentials);
+      setState({
+        user: session.user,
+        isAuthenticated: true,
+        isLoading: false,
+        error: null,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Login failed.';
+      setState((prev: AuthState) => ({ ...prev, isLoading: false, error: message }));
+      throw error;
+    }
+  }, []);
+
+  const register = useCallback(async (data: RegisterData) => {
+    setState((prev: AuthState) => ({ ...prev, isLoading: true, error: null }));
+    try {
+      const session = await authService.register(data);
+      setState({
+        user: session.user,
+        isAuthenticated: true,
+        isLoading: false,
+        error: null,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Registration failed.';
+      setState((prev) => ({ ...prev, isLoading: false, error: message }));
+      throw error;
+    }
+  }, []);
+
+  const signOut = useCallback(async () => {
+    try {
+      await authService.logout();
+    } catch {
+      // Ignore logout errors; always clear local state
+    }
+    clearError();
+    localStorage.removeItem('uptime_auth');
+    setState({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      error: null,
+    });
+    window.location.href = '/login';
+  }, [clearError]);
+
   return (
-    <AuthContext.Provider value={{ user, signOut, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{
+      user: state.user,
+      isAuthenticated: state.isAuthenticated,
+      isLoading: state.isLoading,
+      error: state.error,
+      signOut,
+      login,
+      register,
+      clearError,
+    }}>
       {children}
     </AuthContext.Provider>
   );

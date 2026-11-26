@@ -1,3 +1,4 @@
+import { ClientFormData } from '../types/client.types';
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useClient } from '../hooks/useClient';
@@ -20,13 +21,7 @@ export const ClientEditPage = () => {
     }
   }, [error]);
 
-  const handleSubmit = async (data: {
-    name: string;
-    email: string;
-    phone: string;
-    address: string;
-    status: 'active' | 'inactive' | 'pending';
-  }) => {
+  const handleSubmit = async (data: ClientFormData) => {
     if (!clientId) return;
     setSaving(true);
     setServerError(null);
@@ -54,8 +49,8 @@ export const ClientEditPage = () => {
 
   if (!client || serverError) {
     return (
-      <div className="py-8 px-4 sm:px-6 lg:px-8">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div className="py-8 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800">
+        <div className="bg-white dark:bg-red-900 border border-red-200 dark:border-red-900/30 rounded-lg p-4">
           <h3 className="text-red-800 font-medium">Client not found</h3>
           <p className="mt-1 text-red-600">{serverError}</p>
           <button
@@ -79,9 +74,9 @@ export const ClientEditPage = () => {
       </div>
 
       {serverError && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-          <h3 className="text-red-800 font-medium">Error</h3>
-          <p className="mt-1 text-red-600">{serverError}</p>
+        <div className="mb-6 bg-white dark:bg-red-900 border border-red-200 dark:border-red-900/30 rounded-lg p-4">
+          <h3 className="text-red-800 dark:text-red-400 font-medium">Error</h3>
+          <p className="mt-1 text-red-600 dark:text-red-400">{serverError}</p>
         </div>
       )}
 
@@ -92,6 +87,7 @@ export const ClientEditPage = () => {
           phone: client.phone,
           address: client.address,
           status: client.status,
+          description: client.description,
         }}
         onSubmit={handleSubmit}
         onCancel={() => navigate('/clients')}

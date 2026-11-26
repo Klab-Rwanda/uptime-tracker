@@ -6,6 +6,7 @@ import {
   ClientDetailsPage,
   SettingsPage,
   CompanyTeamPage,
+  OverviewPage,
 } from './pages';
 
 /**
@@ -16,7 +17,7 @@ import {
 export const clientRoutes: RouteObject[] = [
   {
     index: true,
-    element: <div className="text-gray-500">Select a client section above.</div>,
+    element: <OverviewPage />,
   },
   {
     path: 'clients',

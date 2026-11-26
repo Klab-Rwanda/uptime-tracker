@@ -12,6 +12,7 @@ interface ClientFormProps {
 export const ClientForm = ({ initialData, onSubmit, onCancel, loading }: ClientFormProps) => {
   const [formData, setFormData] = useState<ClientFormData>({
     name: initialData?.name ?? '',
+    description: initialData?.description ?? '',
     email: initialData?.email ?? '',
     phone: initialData?.phone ?? '',
     address: initialData?.address ?? '',
@@ -52,11 +53,7 @@ export const ClientForm = ({ initialData, onSubmit, onCancel, loading }: ClientF
           autoComplete="name"
           value={formData.name}
           onChange={(e) => handleChange('name', e.target.value)}
-          className={`mt-1 block w-full pl-3 pr-3 py-2 border leading-5 bg-white placeholder-gray-500 focus:outline-none focus:sm:text-sm focus:ring-1 ${
-            errors.name
-              ? 'focus:ring-red-500 focus:border-red-500 border-red-300'
-              : 'focus:ring-indigo-500 focus:border-indigo-500 border-gray-300'
-          } sm:text-sm rounded-md`}
+          className={`mt-1 block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:sm:text-sm focus:ring-1 focus:border-indigo-500 sm:text-sm`}
           placeholder="John Doe"
         />
         {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
@@ -73,11 +70,7 @@ export const ClientForm = ({ initialData, onSubmit, onCancel, loading }: ClientF
           autoComplete="email"
           value={formData.email}
           onChange={(e) => handleChange('email', e.target.value)}
-          className={`mt-1 block w-full pl-3 pr-3 py-2 border leading-5 bg-white placeholder-gray-500 focus:outline-none focus:sm:text-sm focus:ring-1 ${
-            errors.email
-              ? 'focus:ring-red-500 focus:border-red-500 border-red-300'
-              : 'focus:ring-indigo-500 focus:border-indigo-500 border-gray-300'
-          } sm:text-sm rounded-md`}
+          className={`mt-1 block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:sm:text-sm focus:ring-1 focus:border-indigo-500 sm:text-sm`}
           placeholder="john@example.com"
         />
         {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
@@ -94,11 +87,7 @@ export const ClientForm = ({ initialData, onSubmit, onCancel, loading }: ClientF
           autoComplete="tel"
           value={formData.phone}
           onChange={(e) => handleChange('phone', e.target.value)}
-          className={`mt-1 block w-full pl-3 pr-3 py-2 border leading-5 bg-white placeholder-gray-500 focus:outline-none focus:sm:text-sm focus:ring-1 ${
-            errors.phone
-              ? 'focus:ring-red-500 focus:border-red-500 border-red-300'
-              : 'focus:ring-indigo-500 focus:border-indigo-500 border-gray-300'
-          } sm:text-sm rounded-md`}
+          className={`mt-1 block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:sm:text-sm focus:ring-1 focus:border-indigo-500 sm:text-sm`}
           placeholder="+1-555-0100"
         />
         {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
@@ -114,11 +103,7 @@ export const ClientForm = ({ initialData, onSubmit, onCancel, loading }: ClientF
           type="text"
           value={formData.address}
           onChange={(e) => handleChange('address', e.target.value)}
-          className={`mt-1 block w-full pl-3 pr-3 py-2 border leading-5 bg-white placeholder-gray-500 focus:outline-none focus:sm:text-sm focus:ring-1 ${
-            errors.address
-              ? 'focus:ring-red-500 focus:border-red-500 border-red-300'
-              : 'focus:ring-indigo-500 focus:border-indigo-500 border-gray-300'
-          } sm:text-sm rounded-md`}
+          className={`mt-1 block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:sm:text-sm focus:ring-1 focus:border-indigo-500 sm:text-sm`}
           placeholder="123 Main St, City, State"
         />
         {errors.address && <p className="mt-1 text-sm text-red-600">{errors.address}</p>}

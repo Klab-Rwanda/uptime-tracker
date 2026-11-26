@@ -9,7 +9,6 @@ import {
   Settings as SettingsIcon,
   LogOut,
   Menu,
-  ChevronRight,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -125,7 +124,10 @@ export const WorkspaceSidebar = () => {
         <div className="flex-1" />
 
         {/* Footer */}
-        <div className="px-4 pb-6">
+
+        {/* Footer */}
+
+        <div className="mt-auto px-4 pb-6">
           <div className="space-y-1">
             <p className="text-sm font-medium text-gray-900 dark:text-white">
               {user?.email || 'user@example.com'}
@@ -136,26 +138,12 @@ export const WorkspaceSidebar = () => {
           </div>
           <button
             onClick={handleSignOut}
-            className="mt-3 w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white rounded-lg transition-colors border border-transparent"
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white rounded-lg transition-colors border border-transparent"
           >
             <LogOut size={16} strokeWidth={1.5} />
             <span>Sign out</span>
           </button>
         </div>
-
-        {/* Collapse toggle (desktop only) */}
-        {!isMobile && (
-          <button
-            onClick={toggleCollapse}
-            className="absolute bottom-4 left-4 w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 hover:text-gray-700 dark:hover:text-white transition-colors"
-          >
-            <ChevronRight
-              size={18}
-              strokeWidth={2}
-              className={isCollapsed ? 'rotate-180' : ''}
-            />
-          </button>
-        )}
 
         {/* Mobile menu button */}
         {isMobile && (

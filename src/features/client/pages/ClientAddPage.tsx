@@ -12,12 +12,14 @@ export const ClientAddPage = () => {
   const [serverError, setServerError] = useState<string | null>(null);
   const [formData, setFormData] = useState<{
     name: string;
+    description: string;
     email: string;
     phone: string;
     address: string;
     status: 'active' | 'inactive' | 'pending';
   }>({
     name: '',
+    description: '',
     email: '',
     phone: '',
     address: '',
@@ -70,8 +72,8 @@ export const ClientAddPage = () => {
   };
 
   return (
-    <div className="relative left-1/2 -ml-[40vw] w-[80vw] -mt-6 min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 md:p-8">
+    <div className="relative left-1/2 -ml-[40vw] w-[80vw] -mt-6 min-h-screen bg-gray-50 dark:bg-gray-800 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 md:p-8">
         {serverError && (
           <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200">
             <h3 className="text-sm font-medium text-red-800">Error</h3>
@@ -102,7 +104,30 @@ export const ClientAddPage = () => {
               {errors.name && (
                 <p className="mt-1 text-sm text-red-600">{errors.name}</p>
               )}
+
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              <input
+                id="description"
+                name="description"
+                type="text"
+                autoComplete="description"
+                value={formData.description}
+                onChange={(e) => handleChange('description', e.target.value)}
+                className={`w-full pl-3 pr-3 py-2.5 border leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm rounded-lg ${
+                  errors.description
+                    ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
+                    : 'border-gray-300'
+                }`}
+                placeholder="Enter a description"
+              />
+              {errors.description && (
+                <p className="mt-1 text-sm text-red-600">{errors.description}</p>
+              )}
             </div>
+          </div>
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
