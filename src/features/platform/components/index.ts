@@ -4,3 +4,8 @@ export { PlatformCard } from './PlatformCard';
 export { PlatformSearch } from './PlatformSearch';
 export { PlatformFilter } from './PlatformFilter';
 export { StatusBadge } from './StatusBadge';
+export { ClientSelect } from './ClientSelect';
+export { AvailabilityMetrics } from './AvailabilityMetrics';
+export { ResponseTimeMetrics } from './ResponseTimeMetrics';
+export { MonitoringHistory } from './MonitoringHistory';
+export { UptimePercentage } from './UptimePercentage';
