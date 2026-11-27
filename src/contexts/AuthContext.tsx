@@ -12,6 +12,7 @@ export interface AuthContextType {
   error: string | null;
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
+  verifyEmail: (email: string, code: string) => Promise<void>;
   clearError: () => void;
 }
 
@@ -68,10 +69,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = useCallback(async (data: RegisterData) => {
     setState((prev: AuthState) => ({ ...prev, isLoading: true, error: null }));
     try {
-      const session = await authService.register(data);
+      await authService.register(data);
       setState({
-        user: session.user,
-        isAuthenticated: true,
+        user: null,
+        isAuthenticated: false,
         isLoading: false,
         error: null,
       });
@@ -82,22 +83,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const verifyEmail = useCallback(async (email: string, code: string) => {
+    setState((prev: AuthState) => ({ ...prev, isLoading: true, error: null }));
+    try {
+      await authService.verifyEmail(email, code);
+      setState((prev) => ({ ...prev, isLoading: false, error: null }));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Email verification failed.';
+      setState((prev) => ({ ...prev, isLoading: false, error: message }));
+      throw error;
+    }
+  }, []);
+
   const signOut = useCallback(async () => {
+    let logoutError: string | null = null;
     try {
       await authService.logout();
-    } catch {
-      // Ignore logout errors; always clear local state
+    } catch (error) {
+      logoutError = error instanceof Error ? error.message : 'Sign out failed.';
     }
-    clearError();
     localStorage.removeItem('uptime_auth');
     setState({
       user: null,
       isAuthenticated: false,
       isLoading: false,
-      error: null,
+      error: logoutError,
     });
     window.location.href = '/login';
-  }, [clearError]);
+  }, []);
 
   return (
     <AuthContext.Provider value={{
@@ -108,6 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signOut,
       login,
       register,
+      verifyEmail,
       clearError,
     }}>
       {children}

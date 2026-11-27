@@ -5,6 +5,13 @@ export interface AuthUser {
   role: string | null;
 }
 
+export interface AuthSession {
+  user: AuthUser;
+  accessToken: string;
+  refreshToken: string;
+  expiresAt: number;
+}
+
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -15,8 +22,6 @@ export interface RegisterData {
   email: string;
   password: string;
   confirmPassword: string;
-  accountType: 'company' | 'individual';
-  companyName?: string;
 }
 
 export interface AuthState {
