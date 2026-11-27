@@ -35,7 +35,11 @@ UpTime Tracker is a frontend application for monitoring service uptime. This rep
    cp .env.example .env
    ```
 
-   Then edit `.env` and fill in the required values (see `.env.example`).
+   The default `VITE_API_URL=/api` uses the Vite development/preview proxy to reach the hosted
+   PulseMonitor API without browser CORS errors. For production, configure your hosting platform
+   to reverse-proxy `/api/*` to `https://uptime-tracker-api.onrender.com/*`, or configure the API
+   to allow your deployed frontend origin. The dashboard and authentication use this API; some
+   other feature areas still use local mock data.
 
 ## Available scripts
 
