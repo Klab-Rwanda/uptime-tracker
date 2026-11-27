@@ -20,7 +20,7 @@ export const SignUpPage = () => {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      navigate('/', { replace: true });
+      navigate('/dashboard', { replace: true });
     }
   }, [isLoading, isAuthenticated, navigate]);
 

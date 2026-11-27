@@ -10,6 +10,7 @@ import { ProtectedRoute } from './features/auth/components/ProtectedRoute';
 import { LoginPage } from './features/auth/pages/LoginPage';
 import { SignUpPage } from './features/auth/pages/SignUpPage';
 import { ForgotPasswordPage } from './features/auth/pages/ForgotPasswordPage';
+import { LandingPage } from './features/auth/pages/LandingPage';
 
 const protectedAppRoutes = [
   ...platformRoutes,
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
           </ProtectedRoute>
         ),
         children: protectedAppRoutes,
+      },
+      {
+        index: true,
+        element: <LandingPage />,
       },
       {
         path: 'login',

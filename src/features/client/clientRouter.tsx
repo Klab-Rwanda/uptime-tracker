@@ -16,7 +16,7 @@ import {
  */
 export const clientRoutes: RouteObject[] = [
   {
-    index: true,
+    path: 'dashboard',
     element: <OverviewPage />,
   },
   {

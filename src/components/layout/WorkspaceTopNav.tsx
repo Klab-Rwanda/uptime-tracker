@@ -2,7 +2,7 @@ import { useLocation } from 'react-router-dom';
 import { Bell, LayoutDashboard } from 'lucide-react';
 
 const BREADCRUMB_MAP: Record<string, string> = {
-  '/': 'Overview',
+  '/dashboard': 'Overview',
   '/platforms': 'Platforms',
   '/logs': 'Logs & incidents',
   '/incidents': 'Incidents',

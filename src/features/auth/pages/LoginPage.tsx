@@ -14,7 +14,7 @@ export const LoginPage = () => {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      navigate('/', { replace: true });
+      navigate('/dashboard', { replace: true });
     }
   }, [isLoading, isAuthenticated, navigate]);
 
@@ -36,7 +36,7 @@ export const LoginPage = () => {
     }
     try {
       await login({ email: email.trim(), password });
-      navigate('/', { replace: true });
+      navigate('/dashboard', { replace: true });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Login failed. Please try again.';
       setSubmitError(message);
