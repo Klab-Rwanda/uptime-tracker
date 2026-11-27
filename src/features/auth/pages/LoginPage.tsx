@@ -14,7 +14,7 @@ export const LoginPage = () => {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      navigate('/clients', { replace: true });
+      navigate('/', { replace: true });
     }
   }, [isLoading, isAuthenticated, navigate]);
 
@@ -36,7 +36,7 @@ export const LoginPage = () => {
     }
     try {
       await login({ email: email.trim(), password });
-      navigate('/clients', { replace: true });
+      navigate('/', { replace: true });
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Login failed. Please try again.';
       setSubmitError(message);
@@ -103,7 +103,7 @@ export const LoginPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder='you@company.com'
-              className='block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md text-sm leading-5 bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none'
+              className='block w-full pl-3 pr-3 py-2 border border-gray-300 rounded-md text-sm leading-5 bg-white text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none'
             />
           </div>
           <div>
@@ -121,7 +121,7 @@ export const LoginPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder='•••••••'
-                className='block w-full pl-3 pr-12 py-2 border border-gray-300 rounded-md text-sm leading-5 bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none pr-10'
+                className='block w-full pl-3 pr-12 py-2 border border-gray-300 rounded-md text-sm leading-5 bg-white text-gray-900 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none pr-10'
               />
               <button
                 type='button'
@@ -141,7 +141,7 @@ export const LoginPage = () => {
           <button
             type='submit'
             disabled={isLoading}
-            className='w-full inline-flex items-center gap-2 justify-center py-2.5 px-4 border border-transparent shadow-sm text-sm font-medium text-white bg-blue-700 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors rounded-md'
+            className='w-full inline-flex items-center gap-2 justify-center py-2.5 px-4 border border-transparent shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors rounded-md'
           >
             {buttonContent}
           </button>
