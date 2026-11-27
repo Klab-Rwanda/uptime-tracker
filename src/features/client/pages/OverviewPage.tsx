@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import {
   Activity,
   AlertCircle,
-  ArrowUpRight,
   CheckCircle2,
   Clock3,
   Plus,
@@ -14,15 +12,20 @@ import {
   WifiOff,
   Zap,
 } from 'lucide-react';
-import { settingsService } from '../services/settingsService';
-import { platformService } from '../../platform/services/platformService';
-import { Platform } from '../../platform/types/platform.types';
-import { incidentsService } from '../../logs-incidents/services/logsIncidentsService';
-import { Incident } from '../../logs-incidents/types/logsIncidents.types';
+import {
+  DashboardIncident,
+  DashboardMonitor,
+  DashboardSummary,
+  dashboardService,
+  Organization,
+} from '../services/dashboardService';
 
-type PlatformStatus = Platform['status'];
+type MonitorHealthStatus = 'online' | 'offline' | 'degraded' | 'unknown' | 'maintenance';
 
-const STATUS_STYLES: Record<PlatformStatus, { label: string; dot: string; text: string; bar: string }> = {
+const STATUS_STYLES: Record<
+  MonitorHealthStatus,
+  { label: string; dot: string; text: string; bar: string }
+> = {
   online: {
     label: 'Online',
     dot: 'bg-green-500',
@@ -42,22 +45,33 @@ const STATUS_STYLES: Record<PlatformStatus, { label: string; dot: string; text: 
     bar: 'bg-amber-500',
   },
   unknown: {
-    label: 'Unknown',
+    label: 'Pending / paused',
     dot: 'bg-gray-400',
     text: 'text-gray-600 dark:text-gray-400',
     bar: 'bg-gray-300 dark:bg-gray-600',
   },
+  maintenance: {
+    label: 'Maintenance',
+    dot: 'bg-blue-500',
+    text: 'text-blue-700 dark:text-blue-400',
+    bar: 'bg-blue-500',
+  },
 };
 
-const STATUS_ORDER: PlatformStatus[] = ['online', 'degraded', 'offline', 'unknown'];
+const STATUS_ORDER: MonitorHealthStatus[] = [
+  'online',
+  'degraded',
+  'offline',
+  'maintenance',
+  'unknown',
+];
 
 interface MetricCardProps {
   label: string;
-  value: number;
+  value: number | string;
   description: string;
   icon: typeof Server;
   accent: string;
-  onClick?: () => void;
 }
 
 const MetricCard = ({
@@ -66,7 +80,6 @@ const MetricCard = ({
   description,
   icon: Icon,
   accent,
-  onClick,
 }: MetricCardProps) => {
   const content = (
     <>
@@ -85,30 +98,18 @@ const MetricCard = ({
     </>
   );
 
-  const className =
-    'block rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:border-indigo-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800';
-
-  return onClick ? (
-    <button className={`${className} text-left`} onClick={onClick} type="button">
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
       {content}
-    </button>
-  ) : (
-    <div className={className}>{content}</div>
+    </div>
   );
 };
 
-const formatTimeAgo = (value: string | null) => {
-  if (!value) return 'Awaiting first check';
-
-  const timestamp = new Date(value).getTime();
-  if (Number.isNaN(timestamp)) return 'Last check time unavailable';
-
-  const minutes = Math.max(0, Math.floor((Date.now() - timestamp) / 60_000));
-  if (minutes < 1) return 'Checked just now';
-  if (minutes < 60) return `Checked ${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `Checked ${hours}h ago`;
-  return `Checked ${Math.floor(hours / 24)}d ago`;
+const monitorStatus = (status: string): MonitorHealthStatus => {
+  if (status === 'up') return 'online';
+  if (status === 'down') return 'offline';
+  if (status === 'maintenance') return 'maintenance';
+  return 'unknown';
 };
 
 const formatIncidentTime = (value: string) => {
@@ -119,32 +120,49 @@ const formatIncidentTime = (value: string) => {
 };
 
 export const OverviewPage = () => {
-  const navigate = useNavigate();
-  const [companyName, setCompanyName] = useState('PulseMonitor Workspace');
-  const [platforms, setPlatforms] = useState<Platform[]>([]);
-  const [platformTotal, setPlatformTotal] = useState(0);
-  const [incidents, setIncidents] = useState<Incident[]>([]);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [selectedOrganizationId, setSelectedOrganizationId] = useState<string | null>(null);
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [monitors, setMonitors] = useState<DashboardMonitor[]>([]);
+  const [incidents, setIncidents] = useState<DashboardIncident[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [organizationName, setOrganizationName] = useState('');
+  const [creatingOrganization, setCreatingOrganization] = useState(false);
 
-  const loadData = useCallback(async () => {
+  const loadData = useCallback(async (organizationId?: string) => {
     setLoading(true);
     setError(null);
     try {
-      const [company, platformResponse, incidentResponse] = await Promise.all([
-        settingsService.getCompany(),
-        platformService.getPlatforms({ page: 1, limit: 1000 }),
-        incidentsService.getIncidents({ page: 1, limit: 1000 }),
+      const availableOrganizations = await dashboardService.getOrganizations();
+      setOrganizations(availableOrganizations);
+
+      const storedOrganizationId = localStorage.getItem('uptime_selected_organization');
+      const selectedOrganization =
+        availableOrganizations.find((organization) => organization.id === organizationId) ??
+        availableOrganizations.find((organization) => organization.id === storedOrganizationId) ??
+        availableOrganizations[0];
+
+      if (!selectedOrganization) {
+        setSelectedOrganizationId(null);
+        setSummary(null);
+        setMonitors([]);
+        setIncidents([]);
+        localStorage.removeItem('uptime_selected_organization');
+        return;
+      }
+
+      setSelectedOrganizationId(selectedOrganization.id);
+      localStorage.setItem('uptime_selected_organization', selectedOrganization.id);
+
+      const [summaryResponse, monitorResponse, incidentResponse] = await Promise.all([
+        dashboardService.getSummary(selectedOrganization.id),
+        dashboardService.getMonitors(selectedOrganization.id),
+        dashboardService.getRecentIncidents(selectedOrganization.id),
       ]);
-      setCompanyName(company.companyName);
-      setPlatforms(platformResponse.data);
-      setPlatformTotal(platformResponse.total);
-      setIncidents(
-        incidentResponse.data.sort(
-          (left, right) =>
-            new Date(right.startTime).getTime() - new Date(left.startTime).getTime(),
-        ),
-      );
+      setSummary(summaryResponse);
+      setMonitors(monitorResponse);
+      setIncidents(incidentResponse);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load dashboard data.');
     } finally {
@@ -156,21 +174,44 @@ export const OverviewPage = () => {
     void loadData();
   }, [loadData]);
 
-  const statusCounts = useMemo(
-    () =>
-      platforms.reduce<Record<PlatformStatus, number>>(
-        (counts, platform) => {
-          counts[platform.status] += 1;
-          return counts;
-        },
-        { online: 0, offline: 0, degraded: 0, unknown: 0 },
-      ),
-    [platforms],
+  const statusCounts = useMemo<Record<MonitorHealthStatus, number | null>>(
+    () => ({
+      online: summary?.status_counts.up ?? 0,
+      offline: summary?.status_counts.down ?? 0,
+      degraded: null,
+      unknown:
+        (summary?.status_counts.pending ?? 0) + (summary?.status_counts.paused ?? 0),
+      maintenance: summary?.status_counts.maintenance ?? 0,
+    }),
+    [summary],
   );
 
   const openIncidents = incidents.filter(
-    (incident) => incident.status === 'open' || incident.status === 'investigating',
+    (incident) => incident.status !== 'resolved' && incident.status !== 'closed',
   );
+  const platformTotal = summary?.total_monitors ?? 0;
+  const monitorNames = useMemo(
+    () => new Map(monitors.map((monitor) => [monitor.id, monitor.name])),
+    [monitors],
+  );
+
+  const handleCreateOrganization = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const name = organizationName.trim();
+    if (!name) return;
+
+    setCreatingOrganization(true);
+    setError(null);
+    try {
+      const organization = await dashboardService.createOrganization(name);
+      setOrganizationName('');
+      await loadData(organization.id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create organization.');
+    } finally {
+      setCreatingOrganization(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -202,6 +243,45 @@ export const OverviewPage = () => {
     );
   }
 
+  if (!selectedOrganizationId) {
+    return (
+      <div className="min-h-screen bg-gray-50 px-4 py-10 dark:bg-gray-900 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-xl rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800 sm:p-8">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-300">
+            <Server size={22} />
+          </div>
+          <h1 className="mt-5 text-xl font-bold text-gray-900 dark:text-white">
+            Create your monitoring workspace
+          </h1>
+          <p className="mt-2 text-sm leading-6 text-gray-500 dark:text-gray-400">
+            The API account does not belong to an organization yet. Create one to view its projects,
+            monitors, and incidents.
+          </p>
+          <form onSubmit={handleCreateOrganization} className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <input
+              aria-label="Organization name"
+              required
+              minLength={1}
+              maxLength={120}
+              value={organizationName}
+              onChange={(event) => setOrganizationName(event.target.value)}
+              placeholder="Organization name"
+              className="min-w-0 flex-1 rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+            />
+            <button
+              type="submit"
+              disabled={creatingOrganization}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <Plus size={16} />
+              {creatingOrganization ? 'Creating…' : 'Create organization'}
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-7 dark:bg-gray-900 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl space-y-7">
@@ -211,28 +291,39 @@ export const OverviewPage = () => {
               Monitoring overview
             </p>
             <h1 className="mt-1 text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-3xl">
-              {companyName}
+              {organizations.find((organization) => organization.id === selectedOrganizationId)?.name}
             </h1>
             <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
               A live snapshot of your platform health and recent incidents.
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
+            {organizations.length > 1 && (
+              <label className="sr-only" htmlFor="dashboard-organization">
+                Organization
+              </label>
+            )}
+            {organizations.length > 1 && (
+              <select
+                id="dashboard-organization"
+                value={selectedOrganizationId}
+                onChange={(event) => void loadData(event.target.value)}
+                className="rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-700 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+              >
+                {organizations.map((organization) => (
+                  <option key={organization.id} value={organization.id}>
+                    {organization.name}
+                  </option>
+                ))}
+              </select>
+            )}
             <button
               type="button"
-              onClick={() => void loadData()}
+              onClick={() => void loadData(selectedOrganizationId)}
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
             >
               <RefreshCw size={16} />
               Refresh
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate('/platforms/add')}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-            >
-              <Plus size={17} />
-              Add platform
             </button>
           </div>
         </section>
@@ -241,39 +332,37 @@ export const OverviewPage = () => {
           <MetricCard
             label="Total monitors"
             value={platformTotal}
-            description="Platforms in your workspace"
+            description="Monitors in this organization"
             icon={Server}
             accent="bg-indigo-50 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-300"
-            onClick={() => navigate('/platforms')}
           />
           <MetricCard
             label="Online"
-            value={statusCounts.online}
+            value={statusCounts.online ?? 0}
             description="Responding normally"
             icon={CheckCircle2}
             accent="bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400"
           />
           <MetricCard
             label="Offline"
-            value={statusCounts.offline}
+            value={statusCounts.offline ?? 0}
             description="Not responding"
             icon={WifiOff}
             accent="bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400"
           />
           <MetricCard
             label="Degraded"
-            value={statusCounts.degraded}
-            description="Experiencing issues"
+            value="—"
+            description="Not reported by this API"
             icon={Zap}
             accent="bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400"
           />
           <MetricCard
-            label="Open incidents"
+            label="Open incidents (recent)"
             value={openIncidents.length}
-            description="Open or being investigated"
+            description="In the latest five incidents"
             icon={AlertCircle}
             accent="bg-rose-50 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400"
-            onClick={() => navigate('/incidents')}
           />
         </section>
 
@@ -285,54 +374,48 @@ export const OverviewPage = () => {
                   Platform availability
                 </h2>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  Current status across {platformTotal} monitored platforms
+                    Current status across {platformTotal} monitors
                 </p>
               </div>
-              <Link
-                to="/platforms"
-                className="inline-flex items-center gap-1 text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
-              >
-                View platforms <ArrowUpRight size={15} />
-              </Link>
             </div>
 
             {platformTotal === 0 ? (
               <div className="mt-7 rounded-xl border border-dashed border-gray-300 px-5 py-9 text-center dark:border-gray-600">
                 <Server size={25} className="mx-auto text-gray-400" />
                 <p className="mt-3 text-sm font-medium text-gray-800 dark:text-gray-200">
-                  No platforms are being monitored yet
+                  No monitors are configured yet
                 </p>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  Add a platform to start seeing its health here.
+                  Add a monitor to start seeing its health here.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => navigate('/platforms/add')}
-                  className="mt-4 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                >
-                  Add your first platform
-                </button>
               </div>
             ) : (
               <>
                 <div
                   className="mt-7 flex h-3 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700"
                   role="img"
-                  aria-label={STATUS_ORDER.map(
-                    (status) => `${statusCounts[status]} ${STATUS_STYLES[status].label.toLowerCase()}`,
-                  ).join(', ')}
+                  aria-label={STATUS_ORDER
+                    .filter((status) => statusCounts[status] !== null)
+                    .map(
+                      (status) =>
+                        `${statusCounts[status]} ${STATUS_STYLES[status].label.toLowerCase()}`,
+                    )
+                    .join(', ')}
                 >
                   {STATUS_ORDER.map((status) =>
+                    statusCounts[status] !== null &&
                     statusCounts[status] > 0 ? (
                       <div
                         key={status}
                         className={STATUS_STYLES[status].bar}
-                        style={{ width: `${(statusCounts[status] / platformTotal) * 100}%` }}
+                        style={{
+                          width: `${((statusCounts[status] ?? 0) / platformTotal) * 100}%`,
+                        }}
                       />
                     ) : null,
                   )}
                 </div>
-                <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
                   {STATUS_ORDER.map((status) => (
                     <div key={status} className="rounded-xl bg-gray-50 p-3 dark:bg-gray-900/60">
                       <div className="flex items-center gap-2">
@@ -342,7 +425,7 @@ export const OverviewPage = () => {
                         </span>
                       </div>
                       <p className="mt-2 text-xl font-semibold text-gray-900 dark:text-white">
-                        {statusCounts[status]}
+                        {statusCounts[status] ?? '—'}
                       </p>
                     </div>
                   ))}
@@ -401,15 +484,9 @@ export const OverviewPage = () => {
                   Recent incidents
                 </h2>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  Latest events across your platforms
+                  Latest events across your monitors
                 </p>
               </div>
-              <Link
-                to="/incidents"
-                className="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
-              >
-                View all
-              </Link>
             </div>
             {incidents.length === 0 ? (
               <div className="px-5 py-10 text-center sm:px-6">
@@ -425,13 +502,10 @@ export const OverviewPage = () => {
               <ul className="divide-y divide-gray-100 dark:divide-gray-700">
                 {incidents.slice(0, 5).map((incident) => {
                   const isOpen =
-                    incident.status === 'open' || incident.status === 'investigating';
+                    incident.status !== 'resolved' && incident.status !== 'closed';
                   return (
                     <li key={incident.id}>
-                      <Link
-                        to={`/incidents/${incident.id}`}
-                        className="flex items-start gap-3 px-5 py-4 transition hover:bg-gray-50 dark:hover:bg-gray-700/40 sm:px-6"
-                      >
+                      <div className="flex items-start gap-3 px-5 py-4 sm:px-6">
                         <span
                           className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
                             isOpen
@@ -457,15 +531,14 @@ export const OverviewPage = () => {
                             </span>
                           </span>
                           <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500 dark:text-gray-400">
-                            <span>{incident.platformName || 'Platform'}</span>
+                            <span>{monitorNames.get(incident.monitor_id) || 'Monitor'}</span>
                             <span className="inline-flex items-center gap-1">
                               <Clock3 size={12} />
-                              {formatIncidentTime(incident.startTime)}
+                              {formatIncidentTime(incident.started_at)}
                             </span>
                           </span>
                         </span>
-                        <ArrowUpRight size={16} className="mt-1 shrink-0 text-gray-400" />
-                      </Link>
+                      </div>
                     </li>
                   );
                 })}
@@ -480,40 +553,32 @@ export const OverviewPage = () => {
                   Monitoring summary
                 </h2>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  Latest known status for each platform
+                  Latest known status for each monitor
                 </p>
               </div>
-              <Link
-                to="/platforms"
-                className="text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
-              >
-                View all
-              </Link>
             </div>
-            {platforms.length === 0 ? (
+            {monitors.length === 0 ? (
               <div className="px-5 py-10 text-center sm:px-6">
                 <Server size={26} className="mx-auto text-gray-400" />
                 <p className="mt-3 text-sm font-medium text-gray-800 dark:text-gray-200">
                   Nothing to monitor yet
                 </p>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  Your platform health will show here once you add a monitor.
+                  Monitor status will appear here when the API has monitor records.
                 </p>
               </div>
             ) : (
               <ul className="divide-y divide-gray-100 dark:divide-gray-700">
-                {platforms.slice(0, 5).map((platform) => {
-                  const status = STATUS_STYLES[platform.status];
+                {monitors.slice(0, 5).map((monitor) => {
+                  const health = monitorStatus(monitor.status);
+                  const status = STATUS_STYLES[health];
                   return (
-                    <li key={platform.id}>
-                      <Link
-                        to={`/platforms/${platform.id}`}
-                        className="flex items-center gap-3 px-5 py-4 transition hover:bg-gray-50 dark:hover:bg-gray-700/40 sm:px-6"
-                      >
+                    <li key={monitor.id}>
+                      <div className="flex items-center gap-3 px-5 py-4 sm:px-6">
                         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
-                          {platform.status === 'online' ? (
+                          {health === 'online' ? (
                             <Wifi size={17} />
-                          ) : platform.status === 'offline' ? (
+                          ) : health === 'offline' ? (
                             <WifiOff size={17} />
                           ) : (
                             <Server size={17} />
@@ -521,17 +586,17 @@ export const OverviewPage = () => {
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className="block truncate text-sm font-medium text-gray-900 dark:text-white">
-                            {platform.name}
+                            {monitor.name}
                           </span>
                           <span className="mt-1 block truncate text-xs text-gray-500 dark:text-gray-400">
-                            {formatTimeAgo(platform.lastChecked)}
+                            {monitor.target} · every {monitor.interval_seconds}s
                           </span>
                         </span>
                         <span className={`inline-flex shrink-0 items-center gap-1.5 text-xs font-medium ${status.text}`}>
                           <span className={`h-2 w-2 rounded-full ${status.dot}`} />
                           {status.label}
                         </span>
-                      </Link>
+                      </div>
                     </li>
                   );
                 })}
