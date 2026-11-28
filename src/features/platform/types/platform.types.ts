@@ -17,6 +17,7 @@ export interface PlatformFilters {
   search?: string;
   status?: Platform['status'];
   clientId?: string | null;
+  organizationId?: string;
   page?: number;
   limit?: number;
 }

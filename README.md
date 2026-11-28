@@ -65,6 +65,30 @@ See [docs/PROJECT_STRUCTURE.md](./docs/PROJECT_STRUCTURE.md) for a detailed expl
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on how to contribute to this project.
 
+## API Integration Status
+
+The frontend consumes the hosted PulseMonitor API at `https://uptime-tracker-api.onrender.com`,
+proxied through Vite at `/api/*` during development. Below is the current integration status
+for each feature area.
+
+| Feature | Endpoint(s) | Status | Notes |
+|---------|------------|--------|-------|
+| Platforms (Monitors) | `GET/POST/PATCH/DELETE /v1/monitors/*` | ✅ Implemented | `src/features/platform/services/platformService.ts` |
+| Incidents | `GET/POST/PATCH/DELETE /v1/incidents/*`, `POST /v1/incidents/{id}/resolve` | ✅ Implemented | `src/features/logs-incidents/services/logsIncidentsService.ts` |
+| Clients | `GET/POST/PATCH/DELETE /v1/clients/*` | ⚠️ Not documented | Endpoints not in public API spec — add to backend or map to `/v1/organizations/*` |
+| Logs | `GET /v1/logs/*` | ⚠️ Not documented | Endpoints not in public API spec — add to backend when available |
+| Notification Channels | `GET/POST/PATCH/DELETE /v1/notification-channels/*` | ✅ Implemented | `src/features/notifications/services/notificationsService.ts` |
+| Notification Preferences | `GET/PATCH /v1/notification-preferences/*` | ❌ Not implemented | Throws "not yet implemented" error |
+| Mark as Read | `POST /v1/notifications/{id}/read` | ❌ Not implemented | Throws "not yet implemented" error |
+
+### Adding missing backend endpoints
+
+If an endpoint is missing, either:
+
+1. **Add it to the backend** (PulseMonitor API at `uptime-tracker-api.onrender.com`), then update the corresponding service file to call it.
+2. **Map to an existing endpoint** (e.g., clients → organizations), then update the service file accordingly.
+3. **Flag as "not yet implemented"** — keep the throwing stub in the service and update this table.
+
 ## License
 
 MIT

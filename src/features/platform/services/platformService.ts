@@ -1,168 +1,111 @@
+import { apiRequest } from '../../../services/apiClient';
 import { Platform, PlatformFilters, PlatformListResponse, PlatformFormData } from '../types/platform.types';
 
-const STORAGE_KEY = 'uptime_platforms';
+interface ApiEnvelope<T> {
+  data: T;
+}
 
-const initialPlatforms: Platform[] = [
-  {
-    id: '1',
-    name: 'API Gateway',
-    url: 'https://api.example.com',
-    description: 'Main API gateway for the platform',
-    status: 'unknown',
-    clientId: null,
-    clientName: null,
-    monitoringInterval: 60,
-    lastChecked: null,
-    responseTime: null,
-    createdAt: new Date(Date.now() - 86400000 * 30).toISOString(),
-    updatedAt: new Date(Date.now() - 86400000 * 5).toISOString(),
-  },
-  {
-    id: '2',
-    name: 'Auth Service',
-    url: 'https://auth.example.com',
-    description: 'Authentication and authorization service',
-    status: 'unknown',
-    clientId: null,
-    clientName: null,
-    monitoringInterval: 30,
-    lastChecked: null,
-    responseTime: null,
-    createdAt: new Date(Date.now() - 86400000 * 60).toISOString(),
-    updatedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
-  },
-];
-
-const loadPlatforms = (): Platform[] => {
-  if (typeof window === 'undefined') return initialPlatforms;
-  const stored = localStorage.getItem(STORAGE_KEY);
-  if (stored) {
-    try {
-      return JSON.parse(stored);
-    } catch {
-      return initialPlatforms;
-    }
-  }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(initialPlatforms));
-  return initialPlatforms;
-};
-
-const savePlatforms = (platforms: Platform[]) => {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(platforms));
+/** Read the currently selected organization ID from localStorage (set by OverviewPage). */
+const getSelectedOrganizationId = (): string | null => {
+  if (typeof localStorage === 'undefined') return null;
+  return localStorage.getItem('uptime_selected_organization');
 };
 
 /**
- * Platform API service (mocked with localStorage).
- * Replace with real HTTP calls when a backend is available.
+ * Platform API service.
+ * Platforms map to the /v1/monitors endpoints on the backend.
+ * All calls require authentication and go through the shared apiRequest client.
  */
 export const platformService = {
   getPlatforms: async (filters?: PlatformFilters): Promise<PlatformListResponse> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    let platforms = loadPlatforms();
-
-    if (filters?.search) {
-      const term = filters.search.toLowerCase();
-      platforms = platforms.filter(
-        (p) =>
-          p.name.toLowerCase().includes(term) ||
-          p.url.toLowerCase().includes(term) ||
-          p.description.toLowerCase().includes(term),
-      );
+    const params = new URLSearchParams();
+    if (filters?.search) params.set('search', filters.search);
+    if (filters?.status) params.set('status', filters.status);
+    if (filters?.clientId !== undefined && filters.clientId !== null) {
+      params.set('clientId', filters.clientId);
     }
+    const organizationId = filters?.organizationId ?? getSelectedOrganizationId();
+    if (organizationId) params.set('organization_id', organizationId);
+    if (filters?.page !== undefined) params.set('page', String(filters.page));
+    if (filters?.limit !== undefined) params.set('limit', String(filters.limit));
 
-    if (filters?.status) {
-      platforms = platforms.filter((p) => p.status === filters.status);
-    }
-
-    if (filters?.clientId !== undefined) {
-      platforms = platforms.filter((p) => p.clientId === filters.clientId);
-    }
-
-    const total = platforms.length;
-    const page = filters?.page ?? 1;
-    const limit = filters?.limit ?? 10;
-    const start = (page - 1) * limit;
-    const paginated = platforms.slice(start, start + limit);
-
-    return {
-      data: paginated,
-      total,
-      page,
-      limit,
-    };
+    const response = await apiRequest<ApiEnvelope<PlatformListResponse>>(
+      `/v1/monitors?${params.toString()}`,
+      { authenticated: true }
+    );
+    return response.data;
   },
 
   getPlatformById: async (id: string): Promise<Platform> => {
-    await new Promise((resolve) => setTimeout(resolve, 200));
-    const platforms = loadPlatforms();
-    const platform = platforms.find((p) => p.id === id);
-    if (!platform) {
-      throw new Error(`Platform with id ${id} not found`);
-    }
-    return platform;
+    const response = await apiRequest<ApiEnvelope<Platform>>(
+      `/v1/monitors/${id}`,
+      { authenticated: true }
+    );
+    return response.data;
   },
 
-  createPlatform: async (data: PlatformFormData): Promise<Platform> => {
-    await new Promise((resolve) => setTimeout(resolve, 400));
-    const platforms = loadPlatforms();
-    const now = new Date().toISOString();
-    const newPlatform: Platform = {
-      id: crypto.randomUUID?.() ?? Math.random().toString(36).slice(2),
-      ...data,
-      clientName: data.clientId ? null : null,
-      clientId: data.clientId ?? null,
-      lastChecked: null,
-      responseTime: null,
-      createdAt: now,
-      updatedAt: now,
+  createPlatform: async (
+    data: PlatformFormData,
+    organizationId?: string,
+  ): Promise<Platform> => {
+    const body: Record<string, unknown> = {
+      name: data.name,
+      target: data.url,
+      type: 'http',
+      method: 'GET',
+      interval_seconds: data.monitoringInterval,
+      timeout_seconds: 10,
+      retries: 2,
+      retry_interval_seconds: 30,
+      accepted_status_codes: [200],
     };
-    savePlatforms([...platforms, newPlatform]);
-    return newPlatform;
+    const orgId = organizationId ?? getSelectedOrganizationId();
+    if (orgId) {
+      body.organization_id = orgId;
+    }
+    if (data.clientId) {
+      body.project_id = data.clientId;
+    }
+
+    const response = await apiRequest<ApiEnvelope<Platform>>('/v1/monitors', {
+      method: 'POST',
+      authenticated: true,
+      body,
+    });
+    return response.data;
   },
 
   updatePlatform: async (id: string, data: PlatformFormData): Promise<Platform> => {
-    await new Promise((resolve) => setTimeout(resolve, 400));
-    const platforms = loadPlatforms();
-    const index = platforms.findIndex((p) => p.id === id);
-    if (index === -1) {
-      throw new Error(`Platform with id ${id} not found`);
-    }
-    const updatedPlatform: Platform = {
-      ...platforms[index],
-      ...data,
-      updatedAt: new Date().toISOString(),
-    };
-    platforms[index] = updatedPlatform;
-    savePlatforms(platforms);
-    return updatedPlatform;
+    const response = await apiRequest<ApiEnvelope<Platform>>(`/v1/monitors/${id}`, {
+      method: 'PATCH',
+      authenticated: true,
+      body: {
+        name: data.name,
+        target: data.url,
+        project_id: data.clientId,
+        interval_seconds: data.monitoringInterval,
+        active: data.status === 'online',
+      },
+    });
+    return response.data;
   },
 
   deletePlatform: async (id: string): Promise<void> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    const platforms = loadPlatforms();
-    const filtered = platforms.filter((p) => p.id !== id);
-    if (filtered.length === platforms.length) {
-      throw new Error(`Platform with id ${id} not found`);
-    }
-    savePlatforms(filtered);
+    await apiRequest<never>(`/v1/monitors/${id}`, {
+      method: 'DELETE',
+      authenticated: true,
+    });
   },
 
   assignClient: async (platformId: string, clientId: string | null): Promise<Platform> => {
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    const platforms = loadPlatforms();
-    const index = platforms.findIndex((p) => p.id === platformId);
-    if (index === -1) {
-      throw new Error(`Platform with id ${platformId} not found`);
-    }
-    const updatedPlatform: Platform = {
-      ...platforms[index],
-      clientId,
-      clientName: clientId ? platforms.find((p) => p.id === platformId)?.clientName ?? null : null,
-      updatedAt: new Date().toISOString(),
-    };
-    platforms[index] = updatedPlatform;
-    savePlatforms(platforms);
-    return updatedPlatform;
+    const response = await apiRequest<ApiEnvelope<Platform>>(
+      `/v1/monitors/${platformId}`,
+      {
+        method: 'PATCH',
+        authenticated: true,
+        body: clientId !== null ? { project_id: clientId } : {},
+      }
+    );
+    return response.data;
   },
 };

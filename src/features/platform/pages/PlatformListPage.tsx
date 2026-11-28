@@ -21,8 +21,8 @@ export const PlatformListPage = () => {
   const [limit] = useState(10);
 
   const {
-    platforms,
-    total,
+    platforms = [],
+    total = 0,
     loading,
     refreshing,
     error,

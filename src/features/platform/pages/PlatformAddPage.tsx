@@ -8,7 +8,7 @@ import { PlatformForm } from '../components/PlatformForm';
  * Add platform page.
  * Renders the platform form in create mode.
  */
-export const PlatformAddPage = () => {
+export const PlatformAddPage = ({ organizationId }: { organizationId?: string }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const { refetch } = usePlatforms();
@@ -16,7 +16,7 @@ export const PlatformAddPage = () => {
   const handleSubmit = async (data: PlatformFormData) => {
     setLoading(true);
     try {
-      await platformService.createPlatform(data);
+      await platformService.createPlatform(data, organizationId);
       refetch();
       navigate('/platforms');
     } catch (err) {

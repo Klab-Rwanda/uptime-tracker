@@ -5,6 +5,8 @@ export type {
   ClientFormData,
 } from './types/client.types';
 export { clientService } from './services/clientService';
+export { dashboardService } from './services/dashboardService';
+export { organizationsService } from './services/organizationsService';
 export { useClients } from './hooks/useClients';
 export { useClient } from './hooks/useClient';
 export {
