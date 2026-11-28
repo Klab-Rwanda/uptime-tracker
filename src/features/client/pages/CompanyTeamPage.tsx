@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users,
@@ -9,8 +9,10 @@ import {
   Loader2,
   CheckCircle,
   XCircle,
+  AlertCircle,
 } from 'lucide-react';
 import { formatDate } from '../utils/client.utils';
+import { organizationsService } from '../services/organizationsService';
 export type AccessLevel = 'Viewer' | 'Operator' | 'Administrator';
 
 interface ActiveMember {
@@ -49,73 +51,105 @@ const ROLE_BADGE_CLASSES: Record<AccessLevel, string> = {
   Administrator: 'bg-purple-100 text-purple-800',
 };
 
-const MOCK_ACTIVE_MEMBERS: ActiveMember[] = [
-  { id: 'm1', email: 'owner@example.com', name: 'Alex Owner', role: 'Workspace owner' },
-  { id: 'm2', email: 'subadmin1@example.com', name: 'Sam Subadmin', role: 'Administrator' },
-  { id: 'm3', email: 'viewer1@example.com', name: 'Taylor Viewer', role: 'Viewer' },
-];
-
-const MOCK_PENDING_INVITES: PendingInvite[] = [
-  {
-    id: 'p1',
-    email: 'newmember@example.com',
-    accessLevel: 'Operator',
-    invitedAt: new Date(Date.now() - 86400000 * 1).toISOString(),
-    status: 'pending',
-  },
-  {
-    id: 'p2',
-    email: 'invitee2@example.com',
-    accessLevel: 'Viewer',
-    invitedAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-    status: 'pending',
-  },
-];
-
 const DEFAULT_COMPANY_NAME = 'PulseMonitor Workspace';
+
+const getSelectedOrganizationId = (): string | null => {
+  if (typeof localStorage === 'undefined') return null;
+  return localStorage.getItem('uptime_selected_organization');
+};
 
 export const CompanyTeamPage = () => {
   const navigate = useNavigate();
 
-  const [companyName] = useState(DEFAULT_COMPANY_NAME);
+  const [companyName, setCompanyName] = useState(DEFAULT_COMPANY_NAME);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [organizationId, setOrganizationId] = useState<string | null>(null);
 
-  const [activeMembers, setActiveMembers] = useState<ActiveMember[]>(MOCK_ACTIVE_MEMBERS);
-  const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>(MOCK_PENDING_INVITES);
+  const [activeMembers, setActiveMembers] = useState<ActiveMember[]>([]);
+  const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
 
   const [email, setEmail] = useState('');
   const [accessLevel, setAccessLevel] = useState<AccessLevel>('Viewer');
   const [emailError, setEmailError] = useState<string | null>(null);
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const loadTeamData = useCallback(async () => {
+    const orgId = getSelectedOrganizationId();
+    if (!orgId) {
+      setIsLoading(false);
+      setOrganizationId(null);
+      return;
+    }
+    setOrganizationId(orgId);
+    setIsLoading(true);
+    try {
+      const [membersResp, invitesResp] = await Promise.all([
+        organizationsService.getMembers(orgId),
+        organizationsService.getInvitations(orgId),
+      ]);
+
+      setActiveMembers(
+        membersResp.map((m) => ({
+          id: m.user_id,
+          email: m.email,
+          name: m.full_name || m.email,
+          role: m.role,
+        })),
+      );
+
+      setPendingInvites(
+        invitesResp.map((inv) => ({
+          id: inv.id,
+          email: inv.email,
+          accessLevel: (inv.role as AccessLevel) || 'Viewer',
+          invitedAt: inv.invited_at || inv.created_at,
+          status: (inv.status as 'pending' | 'accepted' | 'cancelled') || 'pending',
+        })),
+      );
+
+      try {
+        const org = await organizationsService.getOrganization(orgId);
+        setCompanyName(org.name);
+      } catch {
+        // keep default name
+      }
+    } catch (err) {
+      console.error('Failed to load team data:', err);
+      setDeleteError('Failed to load team members. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => {
-      setActiveMembers(MOCK_ACTIVE_MEMBERS);
-      setPendingInvites(MOCK_PENDING_INVITES);
-      setIsLoading(false);
-    }, 400);
-    return () => clearTimeout(timer);
-  }, []);
+    loadTeamData();
+  }, [loadTeamData]);
 
   const isValidEmail = (value: string): boolean => {
     if (!value) return false;
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
   };
 
-  const hasDuplicateEmail = (targetEmail: string): boolean => {
-    return activeMembers.some(
+  const hasDuplicateEmail = (targetEmail: string): boolean =>
+    activeMembers.some(
       (member) => member.email.toLowerCase() === targetEmail.toLowerCase(),
+    ) || pendingInvites.some(
+      (invite) => invite.email.toLowerCase() === targetEmail.toLowerCase(),
     );
-  };
 
   const handleAddSubadmin = async (e: React.FormEvent) => {
     e.preventDefault();
     setInviteError(null);
     setSubmitSuccess(null);
+    setDeleteError(null);
 
+    if (!organizationId) {
+      setInviteError('No organization selected. Please select a workspace first.');
+      return;
+    }
     if (!email.trim()) {
       setEmailError('Email is required.');
       return;
@@ -125,39 +159,48 @@ export const CompanyTeamPage = () => {
       return;
     }
     if (hasDuplicateEmail(email.trim().toLowerCase())) {
-      setInviteError('This email is already a member of the company team.');
+      setInviteError('This email is already a member or has a pending invitation.');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      setPendingInvites((prev) => [
-        ...prev,
-        {
-          id: `invite_${Date.now()}`,
-          email: email.trim().toLowerCase(),
-          accessLevel,
-          invitedAt: new Date().toISOString(),
-          status: 'pending',
-        },
-      ]);
+      await organizationsService.inviteMember(organizationId, {
+        email: email.trim().toLowerCase(),
+        role: accessLevel,
+      });
       setEmail('');
       setAccessLevel('Viewer');
-      setSubmitSuccess(`Subadmin invitation created for ${email.trim()}. Pending acceptance.`);
-    } catch (err) {
-      console.error('Failed to add subadmin:', err);
+      await loadTeamData();
+      setSubmitSuccess(`Invitation sent to ${email.trim()}. Pending acceptance.`);
+    } catch (err: any) {
+      setInviteError(err.message || 'Failed to send invitation. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleCancelInvite = (id: string) => {
-    setPendingInvites((prev) =>
-      prev.map((invite) =>
-        invite.id === id ? { ...invite, status: 'cancelled' } : invite,
-      ),
-    );
+  const handleCancelInvite = async (id: string) => {
+    if (!organizationId) return;
+    setDeleteError(null);
+    try {
+      await organizationsService.cancelInvitation(organizationId, id);
+      await loadTeamData();
+    } catch (err: any) {
+      setDeleteError(err.message || 'Failed to cancel invitation.');
+    }
+  };
+
+  const handleRemoveMember = async (memberId: string) => {
+    if (!organizationId) return;
+    setDeleteError(null);
+    if (!window.confirm('Are you sure you want to remove this member?')) return;
+    try {
+      await organizationsService.removeMember(organizationId, memberId);
+      await loadTeamData();
+    } catch (err: any) {
+      setDeleteError(err.message || 'Failed to remove member.');
+    }
   };
 
   if (isLoading) {
@@ -187,6 +230,15 @@ export const CompanyTeamPage = () => {
             Back to workspace
           </button>
         </div>
+
+        {deleteError && (
+          <div className="mb-6 p-3 rounded bg-red-50 border border-red-100">
+            <div className="flex items-start gap-2">
+              <AlertCircle size={16} className="text-red-600 shrink-0 mt-0.5" />
+              <p className="text-sm text-red-700">{deleteError}</p>
+            </div>
+          </div>
+        )}
 
         <section className="bg-white shadow rounded-lg border border-gray-200 mb-8 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-100">
@@ -323,11 +375,19 @@ export const CompanyTeamPage = () => {
                           Owner
                         </span>
                       ) : (
-                        <span
-                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${ROLE_BADGE_CLASSES[member.role as AccessLevel]}`}
-                        >
-                          {member.role}
-                        </span>
+                        <>
+                          <span
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${ROLE_BADGE_CLASSES[member.role as AccessLevel]}`}
+                          >
+                            {member.role}
+                          </span>
+                          <button
+                            onClick={() => handleRemoveMember(member.id)}
+                            className="text-xs text-red-600 hover:text-red-800 hover:underline transition-colors"
+                          >
+                            Remove
+                          </button>
+                        </>
                       )}
                     </div>
                   );
