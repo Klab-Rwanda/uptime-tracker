@@ -86,10 +86,7 @@ export const CompanyTeamPage = () => {
     setOrganizationId(orgId);
     setIsLoading(true);
     try {
-      const [membersResp, invitesResp] = await Promise.all([
-        organizationsService.getMembers(orgId),
-        organizationsService.getInvitations(orgId),
-      ]);
+      const membersResp = await organizationsService.getMembers(orgId);
 
       setActiveMembers(
         membersResp.map((m) => ({
@@ -100,15 +97,25 @@ export const CompanyTeamPage = () => {
         })),
       );
 
-      setPendingInvites(
-        invitesResp.map((inv) => ({
-          id: inv.id,
-          email: inv.email,
-          accessLevel: (inv.role as AccessLevel) || 'Viewer',
-          invitedAt: inv.invited_at || inv.created_at,
-          status: (inv.status as 'pending' | 'accepted' | 'cancelled') || 'pending',
-        })),
-      );
+      // Invitations endpoint may not be available on all backends — degrade gracefully
+      try {
+        const invitesResp = await organizationsService.getInvitations(orgId);
+        setPendingInvites(
+          invitesResp.map((inv) => ({
+            id: inv.id,
+            email: inv.email,
+            accessLevel: (inv.role as AccessLevel) || 'Viewer',
+            invitedAt: inv.invited_at || inv.created_at,
+            status: (inv.status as 'pending' | 'accepted' | 'cancelled') || 'pending',
+          })),
+        );
+      } catch (invErr: any) {
+        if (String(invErr.message).includes('404')) {
+          setPendingInvites([]);
+        } else {
+          console.error('Failed to load invitations:', invErr);
+        }
+      }
 
       try {
         const org = await organizationsService.getOrganization(orgId);
@@ -174,7 +181,14 @@ export const CompanyTeamPage = () => {
       await loadTeamData();
       setSubmitSuccess(`Invitation sent to ${email.trim()}. Pending acceptance.`);
     } catch (err: any) {
-      setInviteError(err.message || 'Failed to send invitation. Please try again.');
+      const msg = err.message || '';
+      if (msg.includes('404')) {
+        setInviteError(
+          'Member invitations are not available for this workspace yet. Please contact your administrator.',
+        );
+      } else {
+        setInviteError(msg || 'Failed to send invitation. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -187,7 +201,12 @@ export const CompanyTeamPage = () => {
       await organizationsService.cancelInvitation(organizationId, id);
       await loadTeamData();
     } catch (err: any) {
-      setDeleteError(err.message || 'Failed to cancel invitation.');
+      const msg = err.message || '';
+      if (msg.includes('404')) {
+        setDeleteError('This action is not available for this workspace yet.');
+      } else {
+        setDeleteError(msg || 'Failed to cancel invitation.');
+      }
     }
   };
 
@@ -199,7 +218,12 @@ export const CompanyTeamPage = () => {
       await organizationsService.removeMember(organizationId, memberId);
       await loadTeamData();
     } catch (err: any) {
-      setDeleteError(err.message || 'Failed to remove member.');
+      const msg = err.message || '';
+      if (msg.includes('404')) {
+        setDeleteError('This action is not available for this workspace yet.');
+      } else {
+        setDeleteError(msg || 'Failed to remove member.');
+      }
     }
   };
 
